@@ -1,0 +1,18 @@
+<svg version="1.1"
+     baseProfile="full"
+     width="90" height="90"
+     xmlns="http://www.w3.org/2000/svg">
+    <defs>
+        <clipPath id="clip-shape" clipPathUnits="objectBoundingBox">
+            <polygon points="0 0, 0 1, 1 0" />
+        </clipPath>
+    </defs>
+    <polygon style="shape-rendering: geometricPrecision;"
+             points="0,0 0,90 90,0"
+             stroke-linecap="square" fill="#00b741"
+             stroke="#00b741" stroke-width="1px" />
+    <polyline style="shape-rendering: geometricPrecision;"
+              points="15,30 25,40 45,20"
+             stroke-linecap="round" stroke-linejoin="round" fill="#00b741"
+             stroke="#ffffff" stroke-width="3px" />
+</svg>

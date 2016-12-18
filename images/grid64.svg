@@ -1,0 +1,10 @@
+<svg version="1.1"
+     baseProfile="full"
+     width="64" height="64"
+     xmlns="http://www.w3.org/2000/svg">
+
+    <polyline style="shape-rendering: crispEdges;"
+              points="0,63 63,63 63,0"
+              stroke-linecap="square" fill="none"
+              stroke="#283947" stroke-width="1px" />
+</svg>
