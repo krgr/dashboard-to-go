@@ -19,7 +19,7 @@ main article {
         height: 80px;
         display: flex;
         justify-content: center; }
-    #widget-bar img { width: 70px; height: 70px; }
+    #widget-bar img { width: 70px; height: 70px; margin: 0 2px; }
 
 /* Design */
 body {

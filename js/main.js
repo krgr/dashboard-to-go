@@ -66,7 +66,8 @@ interact( "#grid td" )
             if ('html-widget' === element[0].id)
             switch (element[0].id) {
                 case 'html-widget':
-/*                    widget[0].innerHTML = '<img src="images/html.svg" />';*/
+/*                    widget[0].innerHTML = '<img src="images/html.svg" />'; */
+                      /* there shall be iframe magic! */
                     break;
                 default:
                     console.log(element);
