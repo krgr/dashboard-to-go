@@ -1,3 +1,74 @@
+/*
+ * HELPER FUNCTIONS
+ */
+
+function generateUUID(){
+    var d = new Date().getTime();
+    if(window.performance && typeof window.performance.now === "function"){
+        d += performance.now(); //use high-precision timer if available
+    }
+    return 'xxxxxxxx-xxxx-4xxx-yxxx-xxxxxxxxxxxx'.replace(/[xy]/g, function(c) {
+        var r = (d + Math.random()*16)%16 | 0;
+        d = Math.floor(d/16);
+        return (c=='x' ? r : (r&0x3|0x8)).toString(16);
+    });
+}
+
+/*
+ * HTML MANIPULATION
+ */
+var addToTable = function(widget) {
+    var gridcell = $($($('#grid').find('tr')[widget.position.row]).find('td')[widget.position.col]);
+
+    var cellWidth = parseInt(gridcell.width()),
+        cellHeight = parseInt(gridcell.height());
+
+    var width = widget.dimension.col * cellWidth + 1,
+        height = widget.dimension.row * cellHeight + 1;
+
+    var div = $('<div class="widget ' + widget.type +'"></div>');
+    div.width(width);
+    div.height(height);
+
+    div.appendTo(gridcell);
+};
+
+var storage = {
+        widgets: []
+    },
+    tmp;
+
+/*
+ * LOCAL STORAGE
+ */
+if (typeof(Storage) !== "undefined") {
+    if (localStorage.dashboard2go) {
+        tmp = JSON.parse(localStorage.dashboard2go);
+    }
+    if (tmp) {
+        storage = tmp;
+        var widget,
+            i,
+            len = tmp.widgets.length;
+        for (i=0; i < len; i += 1) {
+            addToTable(tmp.widgets[i]);
+        }
+    }
+}
+
+var persist = function() {
+    if (typeof(Storage) !== "undefined") {
+        localStorage.dashboard2go = JSON.stringify(storage);
+    }
+};
+
+var addWidget = function(widget) {
+    widget.id = generateUUID();
+    storage.widgets.push(widget);
+    addToTable(widget);
+    persist();
+};
+
 $( ".action-edit").click(function() {
     $( "main").toggleClass("edit");
 });
@@ -5,6 +76,9 @@ $( ".action-edit").click(function() {
 // TODO That's just a shortcut for development
 $( "main").toggleClass("edit");
 
+/*
+ * interact.js related stuff
+ */
 interact( "#widget-bar .widget" )
     .draggable({
         inertia: true,
@@ -53,27 +127,21 @@ interact( "#grid td" )
                 element = $(event.relatedTarget);
             var minCol = (parseInt(element.data( "min-width" )) || 2),
                 minRow = (parseInt(element.data( "min-height" )) || 2);
-            var cellWidth = parseInt(gridcell.width()),
-                cellHeight = parseInt(gridcell.height());
 
-            var width = minCol * cellWidth + 1,
-                height = minRow * cellHeight + 1;
+            var col = gridcell.index();
+            var row = gridcell.parents().index();
 
-            var widget = $('<div class="widget html-widget"></div>');
-            widget.width(width);
-            widget.height(height);
-
-            if ('html-widget' === element[0].id)
-            switch (element[0].id) {
-                case 'html-widget':
-/*                    widget[0].innerHTML = '<img src="images/html.svg" />';*/
-                    break;
-                default:
-                    console.log(element);
-                    break;
-            }
-
-            widget.appendTo(gridcell);
+            addWidget({
+                position: {
+                    col: col,
+                    row: row
+                },
+                dimension: {
+                    col: minCol,
+                    row: minRow
+                },
+                type: element.data('widgetType')
+            });
 
             var relatedTarget = event.relatedTarget;
             relatedTarget.setAttribute('data-x', 0);
