@@ -75,6 +75,19 @@ var addWidget = function(widget) {
 $( ".action-edit").click(function() {
     $( "main").toggleClass("edit");
 });
+$( ".action-edit-widget").click(function() {
+    $( ".widget").toggleClass("edit");
+});
+$( ".action-delete-widget").click(function() {
+    $( "main").toggleClass("edit");
+});
+$( ".action-cancel-widget-edit").click(function() {
+    $( ".widget").toggleClass("edit");
+});
+$( ".action-save-widget-edit").click(function() {
+    $( ".widget").toggleClass("edit");
+});
+
 
 // TODO That's just a shortcut for development
 $( "main").toggleClass("edit");
