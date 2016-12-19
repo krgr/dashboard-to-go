@@ -7,7 +7,7 @@ interact( "#widget-bar .widget" )
         inertia: true,
         autoScroll: true,
         restrict: {
-            restriction: document.getElementsByClassName( "grid" )[0],
+            restriction: document.getElementById( "grid" ),
             endOnly: true
         }
     })
@@ -30,7 +30,7 @@ interact( "#widget-bar .widget" )
         console.log('dropped: ', event.target);
     });
 
-interact( ".grid td" )
+interact( "#grid td" )
     .dropzone({
         accept: '.widget',
         overlap: 0.2,
