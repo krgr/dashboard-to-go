@@ -9,13 +9,26 @@ body {
     color: gray;
     background-color: #091c2d; }
     article {
+        background: #091c2d;
+        -moz-osx-font-smoothing: grayscale; }
+    article table td {
+        width: 4em;
+        height: 4em;
         border-spacing: 0;
         border-style: solid;
         border-width: 1px;
         border-color: #394954;
-        background: #091c2d url(../images/grid64.svg) repeat 0px 0px;
         -moz-osx-font-smoothing: grayscale; }
 
+/* Media modes */
+@media only screen
+  and (orientation: portrait) {
+    article table td:nth-of-type(1n+13) {
+        display: none; } }
+@media only screen
+  and (orientation: landscape) {
+    article table tr:nth-of-type(1n+13) {
+        display: none; } }
 
 /* Interaction */
 
