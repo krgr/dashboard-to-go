@@ -49,31 +49,31 @@ interact( "#grid td" )
             event.target.classList.remove('drop-target');
             event.relatedTarget.classList.remove('can-drop');
 
-            var grid = $(event.target),
+            var gridcell = $(event.target),
                 element = $(event.relatedTarget);
             var minCol = (parseInt(element.data( "min-width" )) || 2),
                 minRow = (parseInt(element.data( "min-height" )) || 2);
-            var cellWidth = parseInt(grid.width()),
-                cellHeight = parseInt(grid.height());
+            var cellWidth = parseInt(gridcell.width()),
+                cellHeight = parseInt(gridcell.height());
 
-            var width = minCol * cellWidth,
-                height = minRow * cellHeight;
+            var width = minCol * cellWidth + 1,
+                height = minRow * cellHeight + 1;
 
-            var widget = $('<div class="widget"></div>');
+            var widget = $('<div class="widget html-widget"></div>');
             widget.width(width);
             widget.height(height);
 
             if ('html-widget' === element[0].id)
             switch (element[0].id) {
                 case 'html-widget':
-                    widget[0].innerHTML = 'HTML Widget';
+/*                    widget[0].innerHTML = '<img src="images/html.svg" />';*/
                     break;
                 default:
                     console.log(element);
                     break;
             }
 
-            widget.appendTo(grid);
+            widget.appendTo(gridcell);
 
             var relatedTarget = event.relatedTarget;
             relatedTarget.setAttribute('data-x', 0);
