@@ -25,6 +25,8 @@ body {
         border-width: 1px;
         border-color: #394954;
         -moz-osx-font-smoothing: grayscale; }
+    #widget-bar .widget {
+        border: 1px solid #394954; }
 
 /* Media modes */
 @media only screen
@@ -57,9 +59,6 @@ main #ok-action {
 main.edit #widget-bar {
     z-index: 100000;
 }
-    main.edit #widget-bar .widget.can-drop {
-        border: 1px solid white;
-    }
 
 main.edit #ok-action {
     opacity: 1; }
