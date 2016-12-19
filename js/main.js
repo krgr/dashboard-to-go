@@ -2,6 +2,7 @@ $( ".action-edit").click(function() {
     $( "main").toggleClass("edit");
 });
 
+// TODO That's just a shortcut for development
 $( "main").toggleClass("edit");
 
 interact( "#widget-bar .widget" )
@@ -24,7 +25,7 @@ interact( "#widget-bar .widget" )
             target.style.transform =
                 'translate(' + x + 'px, ' + y + 'px)';
 
-        // update the posiion attributes
+        // update the position attributes
         target.setAttribute('data-x', x);
         target.setAttribute('data-y', y);
     });
@@ -32,7 +33,7 @@ interact( "#widget-bar .widget" )
 interact( "#grid td" )
     .dropzone({
         accept: '.widget',
-        overlap: 0.2,
+        overlap: 0.1,
         ondropactivate: function(event) {
             // Maybe do something
         },
@@ -74,7 +75,12 @@ interact( "#grid td" )
 
             widget.appendTo(grid);
 
-            console.log('dropped ', element, ' to ', grid);
+            var relatedTarget = event.relatedTarget;
+            relatedTarget.setAttribute('data-x', 0);
+            relatedTarget.setAttribute('data-y', 0);
+            relatedTarget.style.webkitTransform =
+                relatedTarget.style.transform =
+                    'translate(0px, 0px)';
         },
         ondropdeactivate: function(event) {
             // Maybe do something
