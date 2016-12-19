@@ -48,10 +48,22 @@ main #ok-action {
     transition-duration: 0.3s;
     transition-property: opacity;
     opacity: 0; }
+main.edit #widget-bar {
+    z-index: 100000;
+}
+    main.edit #widget-bar .widget.can-drop {
+        border: 1px solid white;
+    }
+
 main.edit #ok-action {
     opacity: 1; }
 main.edit article {
     transform: scale(0.75); }
+
+    article table td.drop-target {
+        background-color: white;
+    }
+
     article #edit-action {
         position: absolute;
         top: 2px;
@@ -59,7 +71,7 @@ main.edit article {
         transition-duration: 0.3s;
         transition-property: opacity; }
     main.edit article #edit-action {
-        opacity: 0; 
+        opacity: 0;
         pointer-events: none; }
         article header h1 {
             font-size: 0.8em;
