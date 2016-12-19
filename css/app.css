@@ -11,7 +11,15 @@ main article {
     #grid { table-layout: fixed; white-space: nowrap; }
     #grid td { white-space: nowrap; overflow: visible; text-overflow: ellipsis; position: relative; }
     #grid td div.widget { position: absolute; top: 0; left: 0; }
-    #widget-bar { position: absolute; bottom: 0; left: 0; width: 100%; height:80px; }
+    #widget-bar {
+        position: absolute;
+        bottom: 0;
+        left: 0;
+        width: 100%;
+        height: 80px;
+        display: flex;
+        justify-content: center; }
+    #widget-bar img { width: 70px; height: 70px; }
 
 /* Design */
 body {
