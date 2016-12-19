@@ -2,6 +2,8 @@ $( ".action-edit").click(function() {
     $( "main").toggleClass("edit");
 });
 
+$( "main").toggleClass("edit");
+
 interact( "#widget-bar .widget" )
     .draggable({
         inertia: true,
@@ -25,9 +27,6 @@ interact( "#widget-bar .widget" )
         // update the posiion attributes
         target.setAttribute('data-x', x);
         target.setAttribute('data-y', y);
-    })
-    .on( "dragend", function(event) {
-        console.log('dropped: ', event.target);
     });
 
 interact( "#grid td" )
@@ -46,7 +45,36 @@ interact( "#grid td" )
             event.relatedTarget.classList.remove('can-drop');
         },
         ondrop: function(event) {
-            console.log('dropped ', event.relatedTarget, ' to ', event.target);
+            event.target.classList.remove('drop-target');
+            event.relatedTarget.classList.remove('can-drop');
+
+            var grid = $(event.target),
+                element = $(event.relatedTarget);
+            var minCol = (parseInt(element.data( "min-width" )) || 2),
+                minRow = (parseInt(element.data( "min-height" )) || 2);
+            var cellWidth = parseInt(grid.width()),
+                cellHeight = parseInt(grid.height());
+
+            var width = minCol * cellWidth,
+                height = minRow * cellHeight;
+
+            var widget = $('<div class="widget"></div>');
+            widget.width(width);
+            widget.height(height);
+
+            if ('html-widget' === element[0].id)
+            switch (element[0].id) {
+                case 'html-widget':
+                    widget[0].innerHTML = 'HTML Widget';
+                    break;
+                default:
+                    console.log(element);
+                    break;
+            }
+
+            widget.appendTo(grid);
+
+            console.log('dropped ', element, ' to ', grid);
         },
         ondropdeactivate: function(event) {
             // Maybe do something
