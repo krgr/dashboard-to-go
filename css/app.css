@@ -15,7 +15,7 @@ main article {
     #grid td div.widget .edit-view>i { float: left; margin-left: 10px; margin-top: 13px ;}
     #grid td div.popup { position: absolute; z-index: 999 }
     #grid td div.popup input { width: 200px; margin-left: 1px; }
-    #grid td div.widget .widget-resize-handler { width: 1.5em; height: 1.5em; bottom: 0px; right: 0px; position: absolute; }
+    #grid td div.widget .widget-resize-handler { width: 3em; height: 3em; bottom: 0px; right: 0px; position: absolute; }
    /* #grid td div.widget div { display: none; }*/
     #widget-bar {
         position: absolute;
