@@ -60,7 +60,6 @@ var interactEventDragmove = function(event) {
         // keep the dragged position in the data-x/data-y attributes
         x = (parseFloat(target.getAttribute('data-x')) || 0) + event.dx,
         y = (parseFloat(target.getAttribute('data-y')) || 0) + event.dy;
-
     // translate the element
     target.style.webkitTransform =
         target.style.transform =
@@ -85,8 +84,7 @@ var addToTable = function(widget) {
     var width = widget.dimension.col * cellWidth - 2,
         height = widget.dimension.row * cellHeight - 2;
 
-    var div = $("#widget-templates").find("." + widget.type).clone(),
-        iframe;
+    var div = $("#widget-templates").find("." + widget.type).clone(), iframe;
     div.attr("id", "widget-" + widget.id);
     div.data("widget-id", widget.id);
     switch (widget.type) {
@@ -128,12 +126,15 @@ var addToTable = function(widget) {
         .resizable({
             edges: { left: false, right: '.widget-resize-handler', bottom: '.widget-resize-handler', top: false }
         })
-        .on( "dragmove", interactEventDragmove)
+        .on('dragstart', function (event) {
+            console.log("dragstart", event);
+            console.log("position", $(event.target).position());
+        })
+        .on('dragmove', interactEventDragmove)
         .on('resizestart', function (event) {
             console.log("resize start", event);
         })
         .on('resizemove', function (event) {
-            // console.log("resize move", event);
             var target = $(event.target);
             var widgetCol = Math.ceil(event.rect.width / cellWidth);
             var widgetRow = Math.ceil(event.rect.height / cellHeight);
