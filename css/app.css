@@ -10,8 +10,9 @@ main article {
     height: 100%; }
     #grid { table-layout: fixed; white-space: nowrap; }
     #grid td { white-space: nowrap; overflow: visible; text-overflow: ellipsis; position: relative; }
-    #grid td div.widget { position: absolute; top: 0; left: 0; text-align: right; z-index: 999; }
-    #grid td div.widget ul { list-style: none; padding: 0; margin: 0 2px; }
+    #grid td div.widget { position: absolute; top: 0; left: 0; z-index: 999; }
+    #grid td div.widget ul { list-style: none; text-align: right; padding: 0; margin: 0 2px; }
+    #grid td div.widget .edit-view>i { float: left; margin-left: 10px; margin-top: 13px ;}
     #grid td div.popup { position: absolute; z-index: 999 }
     #grid td div.popup input { width: 200px; margin-left: 1px; }
     #grid td div.widget .widget-resize-handler { width: 1.5em; height: 1.5em; bottom: 0px; right: 0px; position: absolute; }
@@ -47,7 +48,7 @@ body {
                 #grid td div.widget.show .show-view {  display: block;  }
         #grid td div.html-widget { background: rgba(57, 73, 84, 0.7) url("../images/html.svg") no-repeat; }
             #grid td div.html-widget iframe { border: none; overflow: hidden; }
-        #grid td div.grafana-widget { background: rgba(57, 73, 84, 0.7) url("../images/grafana.svg") no-repeat; }
+        #grid td div.grafana-widget { background: rgba(57, 73, 84, 0.7); }
             #grid td div.grafana-widget iframe { border: none; }
         #grid td div.popup {
             display: none;
