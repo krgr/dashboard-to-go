@@ -35,6 +35,7 @@
                 <img id="ok-action" alt="ok" src="images/ok.svg" class="action-edit" />
                 <div id="widget-bar">
                     <img id="html-widget" alt="html-widget" src="images/html.svg" class="widget" data-widget-type="html-widget" />
+                    <img id="grafana-widget" alt="grafana-widget" src="images/grafana.svg" class="widget" data-widget-type="grafana-widget" />
                 </div>
                 <article> <!-- a dashboard page -->
                     <!--header>
@@ -136,6 +137,34 @@
                 </div>
                 <div class="show-view">
                     <iframe scrolling="no"></iframe>
+                </div>
+            </div>
+            <div class="widget show grafana-widget">
+                <div class="edit-view">
+                    <ul>
+                        <li><i class="fa fa-cog action-edit-widget"> </i></li>
+                        <li><i class="fa fa-trash-o action-delete-widget"> </i></li>
+                    </ul>
+                    <img class="widget-resize-handler" src="images/handler.svg" />
+                    <div class="popup">
+                        <label for="grafana-widget-popup-form-url">Base:</label>
+                        <input id="grafana-widget-popup-form-url" type="text" name="url" value="https://" />
+                        <i class="fa fa-close action-cancel-widget-edit"> </i>
+                        <i class="fa fa-check action-save-widget-edit"> </i>
+                        <br />
+                        <label for="grafana-widget-popup-form-dashboard">Dashboards:</label>
+                        <select id="grafana-widget-popup-form-dashboard" name="dashboard"></select>
+                        <i class="fa fa-close action-cancel-widget-edit"> </i>
+                        <i class="fa fa-check action-save-widget-edit"> </i>
+                        <br />
+                        <label for="grafana-widget-popup-form-panel">Panels:</label>
+                        <select id="grafana-widget-popup-form-panel" name="panel"></select>
+                        <i class="fa fa-close action-cancel-widget-edit"> </i>
+                        <i class="fa fa-check action-save-widget-edit"> </i>
+                    </div>
+                </div>
+                <div class="show-view">
+                    <iframe></iframe>
                 </div>
             </div>
         </div>

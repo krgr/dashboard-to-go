@@ -16,6 +16,12 @@ function generateUUID(){
 
 var storage = {
         widgets: []
+    },
+    grafana = {
+        base: {
+            api: 'https://alpha.zmon.zalan.do/rest/grafana/api/',
+            widget: 'https://alpha.zmon.zalan.do/grafana/dashboard-solo/'
+        }
     };
 
 /*
@@ -51,17 +57,29 @@ var addToTable = function(widget) {
     var width = widget.dimension.col * cellWidth - 2,
         height = widget.dimension.row * cellHeight - 2;
 
-    var div = $("#widget-templates").find("." + widget.type).clone();
+    var div = $("#widget-templates").find("." + widget.type).clone(),
+        iframe;
     div.attr("id", "widget-" + widget.id);
     div.data("widget-id", widget.id);
     switch (widget.type) {
         case "html-widget":
             div.find("label[for='html-widget-popup-form-url']").attr("for", "html-widget-popup-form-url-" + widget.id);
             div.find("#html-widget-popup-form-url").attr("id", "html-widget-popup-form-url-" + widget.id);
-            var iframe = div.find(".show-view iframe");
+            iframe = div.find(".show-view iframe");
             if (widget.data) {
                 iframe.attr("src", widget.data.url);
             }
+            iframe[0].height = height;
+            iframe[0].width= width;
+            break;
+        case "grafana-widget":
+            div.find("label[for='grafana-widget-popup-form-url']").attr("for", "grafana-widget-popup-form-url-" + widget.id);
+            div.find("#grafana-widget-popup-form-url").attr("id", "grafana-widget-popup-form-url-" + widget.id);
+            div.find("label[for='grafana-widget-popup-form-dashboard']").attr("for", "grafana-widget-popup-form-dashboard-" + widget.id);
+            div.find("#grafana-widget-popup-form-dashboard").attr("id", "grafana-widget-popup-form-dashboard-" + widget.id);
+            div.find("label[for='grafana-widget-popup-form-panel']").attr("for", "grafana-widget-popup-form-panel-" + widget.id);
+            div.find("#grafana-widget-popup-form-panel").attr("id", "grafana-widget-popup-form-panel-" + widget.id);
+            iframe = div.find(".show-view iframe");
             iframe[0].height = height;
             iframe[0].width= width;
             break;
@@ -113,6 +131,15 @@ var removeFromTable = function(widget) {
 
 var addWidget = function(widget) {
     widget.id = generateUUID();
+    switch (widget.type) {
+        case "grafana-widget":
+            widget.data = {
+                base: grafana.base
+            };
+            break;
+        default:
+            break;
+    }
     storage.widgets.push(widget);
     persist();
     addToTable(widget);
@@ -169,6 +196,76 @@ $(document).ready(function() {
                 case "html-widget":
                     popup.find("input[name='url']").val(widget.data.url);
                     break;
+                case "grafana-widget":
+                    var grafanaInputBase = popup.find("input[name='url']"),
+                        grafanaSelectDashboard = popup.find("select[name='dashboard']"),
+                        grafanaSelectPanel = popup.find("select[name='panel']");
+                    grafanaSelectDashboard.attr("disabled", true);
+                    grafanaSelectPanel.attr("disabled", true);
+                    grafanaInputBase.val(widget.data.base.api);
+                    var refreshDashboards = function() {
+                        $.ajax(grafanaInputBase.val() + "search", {
+                            crossDomain: true,
+                            xhrFields: {
+                                withCredentials: true
+                            },
+                            success: function(data) {
+                                var i, len = data.length,
+                                    dashboard,
+                                    found;
+                                grafanaSelectDashboard.empty();
+                                for (i=0; i<len; i+=1) {
+                                    dashboard = data[i];
+                                    if (widget.data.dashboard === dashboard.uri) {
+                                        found = dashboard.uri;
+                                    }
+                                    grafanaSelectDashboard.append("<option value=\"" + dashboard.uri + "\"" + (widget.data.dashboard === dashboard.uri ? " selected='\"selected\"'" : "") + ">" + dashboard.title + "</option>")
+                                }
+                                grafanaSelectDashboard.attr("disabled", false);
+                                if (found) {
+                                    refreshPanels(found);
+                                }
+                            },
+                            error: function(response) {
+                                console.error(response);
+                            }
+                        })
+                    };
+
+                    var refreshPanels = function(dashboard) {
+                        $.ajax(grafanaInputBase.val() + "dashboards/" + dashboard, {
+                            crossDomain: true,
+                            xhrFields: {
+                                withCredentials: true
+                            },
+                            success: function(data) {
+                                var panels = [],
+                                    i, len = data.dashboard.rows.length,
+                                    panel;
+                                for (i=0; i<len; i+=1) {
+                                    Array.prototype.push.apply(panels,data.dashboard.rows[i].panels);
+                                }
+                                len = panels.length;
+                                grafanaSelectPanel.empty();
+                                for (i=0; i<len; i+=1) {
+                                    panel = panels[i];
+                                    grafanaSelectPanel.append("<option value=\"" + panel.id + "\"" + (widget.data.panel === panel.id ? " selected='\"selected\"'" : "") + ">" + panel.title + "</option>")
+                                }
+                                grafanaSelectPanel.attr("disabled", false);
+                            },
+                            error: function(response) {
+                                console.error(response);
+                            }
+                        })
+                    };
+                    grafanaInputBase.on("change", function() {
+                        refreshDashboards();
+                    });
+                    grafanaSelectDashboard.on("change", function() {
+                        refreshPanels(grafanaSelectDashboard.val());
+                    });
+                    refreshDashboards();
+                    break;
                 default:
                     // Do nothing
                     break;
@@ -195,6 +292,18 @@ $(document).ready(function() {
                     widget.data = {};
                 }
                 widget.data.url = $(event.target).parents(".popup").find("input[name='url']").val();
+                widgetElement.find(".show-view iframe").attr("src", widget.data.url);
+                break;
+            case "grafana-widget":
+                if (!widget.data) {
+                    widget.data = {};
+                }
+                var popup = $(event.target).parents(".popup"),
+                    panel = popup.find("select[name='panel']").val(),
+                    dashboard = popup.find("select[name='dashboard']").val();
+                widget.data.url = widget.data.base.widget + dashboard + "?panelId=" + panel + "&fullscreen";
+                widget.data.dashboard = dashboard;
+                widget.data.panel = panel;
                 widgetElement.find(".show-view iframe").attr("src", widget.data.url);
                 break;
             default:
