@@ -14,17 +14,48 @@ function generateUUID(){
     });
 }
 
+var storage = {
+        widgets: []
+    },
+    grafana = {
+        base: {
+            api: 'https://alpha.zmon.zalan.do/rest/grafana/api/',
+            widget: 'https://alpha.zmon.zalan.do/grafana/dashboard-solo/'
+        }
+    };
+
+/*
+ * LOCAL STORAGE
+ */
+if (typeof(Storage) !== "undefined") {
+    var tmp;
+    if (localStorage.dashboard2go) {
+        tmp = JSON.parse(localStorage.dashboard2go);
+    }
+    if (tmp) {
+        storage = tmp;
+    }
+}
+
+var persist = function() {
+    if (typeof(Storage) !== "undefined") {
+        localStorage.dashboard2go = JSON.stringify(storage);
+    }
+};
+
 /*
  * HTML MANIPULATION
  */
 var addToTable = function(widget) {
     var gridcell = $($($('#grid').find('tr')[widget.position.row]).find('td')[widget.position.col]);
 
-    var cellWidth = parseInt(gridcell.width()),
-        cellHeight = parseInt(gridcell.height());
+    var cellWidth = parseFloat(gridcell.width()) + 2,
+        cellHeight = parseFloat(gridcell.height()) + 2,
+        cellX = parseFloat(gridcell.position().left),
+        cellY = parseFloat(gridcell.position().top);
 
-    var width = widget.dimension.col * cellWidth + 1,
-        height = widget.dimension.row * cellHeight + 1;
+    var width = widget.dimension.col * cellWidth - 2,
+        height = widget.dimension.row * cellHeight - 2;
 
     var div = $("#widget-templates").find("." + widget.type).clone(),
         iframe;
@@ -60,46 +91,42 @@ var addToTable = function(widget) {
     div.height(height);
 
     div.appendTo(gridcell);
+
+    interact( "#" + div.attr("id") )
+        .resizable({
+            edges: { left: false, right: '.widget-resize-handler', bottom: '.widget-resize-handler', top: false }
+        })
+        .on('resizestart', function (event) {
+            console.log("resize start", event);
+        })
+        .on('resizemove', function (event) {
+            // console.log("resize move", event);
+            var target = $(event.target);
+            var widgetCol = Math.ceil(event.rect.width / cellWidth);
+            var widgetRow = Math.ceil(event.rect.height / cellHeight);
+            target.width(widgetCol * cellWidth - 2 + 'px');
+            target.height(widgetRow * cellHeight - 2 + 'px');
+            // resize iframe
+            var iframe = target.find(".show-view iframe");
+            iframe[0].width = target.width();
+            iframe[0].height = target.height();
+            var widget = getWidget(target.data("widget-id"));
+            widget.dimension = { col: widgetCol, row: widgetRow };
+        })
+        .on("resizeend", function(event) {
+            console.log("resize end", event);
+            persist();
+            var target = $(event.target);
+            var iframe = target.find(".show-view iframe");
+            // reload doesn't work for now because the following code results in the error
+            // "Blocked a frame with origin "null" from accessing a cross-origin frame."
+
+            //iframe[0].contentWindow.location.reload();
+        });
 };
 
 var removeFromTable = function(widget) {
     $("#widget-" + widget.id).remove();
-};
-
-var storage = {
-        widgets: []
-    },
-    grafana = {
-        base: {
-            api: 'https://alpha.zmon.zalan.do/rest/grafana/api/',
-            widget: 'https://alpha.zmon.zalan.do/grafana/dashboard-solo/'
-        }
-    };
-
-/*
- * LOCAL STORAGE
- */
-if (typeof(Storage) !== "undefined") {
-    var tmp;
-    if (localStorage.dashboard2go) {
-        tmp = JSON.parse(localStorage.dashboard2go);
-    }
-    if (tmp) {
-        storage = tmp;
-        $(document).ready(function() {
-            var widget,
-                i, len = storage.widgets.length;
-            for (i=0; i < len; i += 1) {
-                addToTable(tmp.widgets[i]);
-            }
-        });
-    }
-}
-
-var persist = function() {
-    if (typeof(Storage) !== "undefined") {
-        localStorage.dashboard2go = JSON.stringify(storage);
-    }
 };
 
 var addWidget = function(widget) {
@@ -147,6 +174,12 @@ var getWidget = function(id) {
 var grid;
 
 $(document).ready(function() {
+    var widget,
+        i, len = storage.widgets.length;
+    for (i=0; i < len; i += 1) {
+        addToTable(tmp.widgets[i]);
+    }
+
     grid = $("#grid");
 
     $( ".action-edit").click(function(event) {
@@ -279,13 +312,7 @@ $(document).ready(function() {
         }
         persist();
     });
-
-    $( "#edit-action").trigger("click");
 });
-
-// TODO That's just a shortcut for development
-// $( "main").toggleClass("edit");
-// $( ".action-edit").click();
 
 /*
  * interact.js related stuff
