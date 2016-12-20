@@ -12,7 +12,7 @@ main article {
     #grid td { white-space: nowrap; overflow: visible; text-overflow: ellipsis; position: relative; }
     #grid td div.widget { position: absolute; top: 0; left: 0; z-index: 999; }
     #grid td div.widget ul { list-style: none; text-align: right; padding: 0; margin: 0 2px; }
-    #grid td div.widget .edit-view>i { float: left; margin-left: 10px; margin-top: 13px ;}
+    #grid td div.widget .edit-view>i { float: left; margin-left: 10px; margin-top: 13px; }
     #grid td div.popup { position: absolute; z-index: 999 }
     #grid td div.popup input { width: 200px; margin-left: 1px; }
     #grid td div.widget .widget-resize-handler { width: 3em; height: 3em; bottom: 0px; right: 0px; position: absolute; }
@@ -43,10 +43,10 @@ body {
         -moz-osx-font-smoothing: grayscale; }
         body.edit article { background-color: #091c2d; border-color: #394954; }
         #grid td { width: 3em; height: 3em; border: 1px solid #000000; -moz-osx-font-smoothing: grayscale; }
-        #grid td div.widget { background-color: transparent; border: 1px solid #000000;}
+        #grid td div.widget { background-color: transparent; border: 1px solid #000000; }
         body.edit #grid td { border-color: #394954; }
-        body.edit #grid td div.widget { background-color: rgba(57, 73, 84, 0.7); border-color: rgba(255, 255, 255, 0.7);}
-        #grid td div.widget .widget-resize-handler { opacity: 0.7; cursor: nwse-resize;}
+        body.edit #grid td div.widget { background-color: rgba(57, 73, 84, 0.7); border-color: rgba(255, 255, 255, 0.7); }
+        #grid td div.widget .widget-resize-handler { cursor: nwse-resize; }
         #grid td div.widget .edit-view {  display: block;  }
         #grid td div.widget .show-view {  display: none;  }
         #grid td div.widget.show .edit-view {  display: none;  }
