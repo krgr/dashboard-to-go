@@ -31,25 +31,29 @@ main article {
 /* Design */
 body {
     color: gray;
-    background-color: #091c2d;
+    background-color: #000000;
     overflow: hidden; }
 
+    body.edit {
+        background-color: #091c2d; }
+        body.edit #grid td { border-color: #394954; }
     article {
-        background: #091c2d;
+        background-color: rgba(0, 0, 0, 1);
         -moz-osx-font-smoothing: grayscale; }
-        #grid td { width: 3em; height: 3em; border: 1px solid #394954; -moz-osx-font-smoothing: grayscale; }
-        #grid td div.widget { background-color: rgba(57, 73, 84, 0.7); border: 1px solid rgba(255, 255, 255, 0.7);}
-            #grid td div.widget {  }
-                #grid td div.widget .widget-resize-handler { opacity: 0.7; cursor: nwse-resize;}
-                #grid td div.widget .edit-view {  display: block;  }
-                #grid td div.widget .show-view {  display: none;  }
-            #grid td div.widget.show { background: #394954 !important; }
-                #grid td div.widget.show .edit-view {  display: none;  }
-                #grid td div.widget.show .show-view {  display: block;  }
-        #grid td div.html-widget { background: rgba(57, 73, 84, 0.7) url("../images/html.svg") no-repeat; }
-            #grid td div.html-widget iframe { border: none; overflow: hidden; }
-        #grid td div.grafana-widget { background: rgba(57, 73, 84, 0.7); }
-            #grid td div.grafana-widget iframe { border: none; }
+        body.edit article {
+            background-color: #091c2d; }
+        #grid td { width: 3em; height: 3em; border: 1px solid #000000; -moz-osx-font-smoothing: grayscale; }
+        #grid td div.widget { background-color: transparent; border: 1px solid #000000;}
+        body.edit #grid td div.widget { background-color: rgba(57, 73, 84, 0.7); border-color: rgba(255, 255, 255, 0.7);}
+        #grid td div.widget .widget-resize-handler { opacity: 0.7; cursor: nwse-resize;}
+        #grid td div.widget .edit-view {  display: block;  }
+        #grid td div.widget .show-view {  display: none;  }
+        #grid td div.widget.show .edit-view {  display: none;  }
+        #grid td div.widget.show .show-view {  display: block;  }
+        #grid td div.html-widget iframe { border: none; overflow: hidden; }
+        body.edit #grid td div.html-widget { background: rgba(57, 73, 84, 0.7) url("../images/html.svg") no-repeat; }
+        #grid td div.grafana-widget iframe { border: none; }
+        body.edit #grid td div.grafana-widget { background: rgba(57, 73, 84, 0.7); }
         #grid td div.popup {
             display: none;
             top: 1em;
@@ -82,9 +86,12 @@ body {
 
 /* Interaction */
 
+body {
+    transition-duration: 0.3s;
+    transition-property: background-color; }
 main article {
     transition-duration: 0.3s;
-    transition-property: transform; }
+    transition-property: transform, background-color; }
 main #ok-action-clip {
     position: absolute;
     width: 0;
@@ -98,13 +105,13 @@ main #ok-action {
     transition-duration: 0.3s;
     transition-property: opacity;
     opacity: 0; }
-main.edit #widget-bar {
+body.edit #widget-bar {
     z-index: 100000; }
 
-main.edit #ok-action {
+body.edit #ok-action {
     opacity: 1; }
 
-main.edit article {
+body.edit article {
     transform: scale(0.75); }
 
     article table td.drop-target {
@@ -117,7 +124,7 @@ main.edit article {
         left: 3px;
         transition-duration: 0.3s;
         transition-property: opacity; }
-    main.edit article #edit-action {
+    body.edit article #edit-action {
         opacity: 0;
         pointer-events: none; }
         article header h1 {

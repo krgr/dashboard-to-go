@@ -217,7 +217,7 @@ $(document).ready(function() {
     grid = $("#grid");
 
     $( ".action-edit").click(function(event) {
-        $( "main").toggleClass("edit");
+        $( "body").toggleClass("edit");
         $( ".widget" ).toggleClass("show");
     });
 
