@@ -43,13 +43,13 @@ var persist = function() {
 var addToTable = function(widget) {
     var gridcell = $($($('#grid').find('tr')[widget.position.row]).find('td')[widget.position.col]);
 
-    var cellWidth = parseFloat(gridcell.width()) + 1,
-        cellHeight = parseFloat(gridcell.height()) + 1,
+    var cellWidth = parseFloat(gridcell.width()) + 2,
+        cellHeight = parseFloat(gridcell.height()) + 2,
         cellX = parseFloat(gridcell.position().left),
         cellY = parseFloat(gridcell.position().top);
 
-    var width = widget.dimension.col * cellWidth,
-        height = widget.dimension.row * cellHeight;
+    var width = widget.dimension.col * cellWidth - 2,
+        height = widget.dimension.row * cellHeight - 2;
 
     var div = $("#widget-templates").find("." + widget.type).clone();
     div.attr("id", "widget-" + widget.id);
@@ -84,23 +84,26 @@ var addToTable = function(widget) {
         .on('resizemove', function (event) {
             // console.log("resize move", event);
             var target = $(event.target);
-
             var widgetCol = Math.ceil(event.rect.width / cellWidth);
             var widgetRow = Math.ceil(event.rect.height / cellHeight);
-            target.width(widgetCol * (cellWidth + 1) - 2 + 'px');
-            target.height(widgetRow * (cellHeight + 1) - 2 + 'px');
+            target.width(widgetCol * cellWidth - 2 + 'px');
+            target.height(widgetRow * cellHeight - 2 + 'px');
+            // resize iframe
             var iframe = target.find(".show-view iframe");
             iframe[0].width = target.width();
             iframe[0].height = target.height();
             var widget = getWidget(target.data("widget-id"));
             widget.dimension = { col: widgetCol, row: widgetRow };
-            persist();
         })
         .on("resizeend", function(event) {
             console.log("resize end", event);
-            // resize iframe
+            persist();
             var target = $(event.target);
+            var iframe = target.find(".show-view iframe");
+            // reload doesn't work for now because the following code results in the error
+            // "Blocked a frame with origin "null" from accessing a cross-origin frame."
 
+            //iframe[0].contentWindow.location.reload();
         });
 };
 
