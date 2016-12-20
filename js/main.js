@@ -203,13 +203,7 @@ $(document).ready(function() {
         }
         persist();
     });
-
-    $( "#edit-action").trigger("click");
 });
-
-// TODO That's just a shortcut for development
-// $( "main").toggleClass("edit");
-// $( ".action-edit").click();
 
 /*
  * interact.js related stuff
