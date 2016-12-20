@@ -25,6 +25,7 @@ main article {
         display: flex;
         justify-content: center; }
     #widget-bar img { width: 70px; height: 70px; margin: 0 2px; }
+    #widget-bar i { width: 70px; height: 60px; margin: 0 2px; padding-top: 10px; }
 
 /* Design */
 body {
@@ -46,7 +47,7 @@ body {
                 #grid td div.widget.show .show-view {  display: block;  }
         #grid td div.html-widget { background: rgba(57, 73, 84, 0.7) url("../images/html.svg") no-repeat; }
             #grid td div.html-widget iframe { border: none; overflow: hidden; }
-        #grid td div.grafana-widget { background: #394954 url("../images/grafana.svg") no-repeat; }
+        #grid td div.grafana-widget { background: rgba(57, 73, 84, 0.7) url("../images/grafana.svg") no-repeat; }
             #grid td div.grafana-widget iframe { border: none; }
         #grid td div.popup {
             display: none;
