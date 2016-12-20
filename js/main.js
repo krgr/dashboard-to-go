@@ -44,6 +44,34 @@ var persist = function() {
 };
 
 /*
+ * INTERACTION HELPER
+ */
+var interactInteractionDraggable = {
+    inertia: true,
+    autoScroll: true,
+    restrict: {
+        restriction: document.getElementById( "grid" ),
+        endOnly: true
+    }
+};
+
+var interactEventDragmove = function(event) {
+    var target = event.target,
+        // keep the dragged position in the data-x/data-y attributes
+        x = (parseFloat(target.getAttribute('data-x')) || 0) + event.dx,
+        y = (parseFloat(target.getAttribute('data-y')) || 0) + event.dy;
+
+    // translate the element
+    target.style.webkitTransform =
+        target.style.transform =
+            'translate(' + x + 'px, ' + y + 'px)';
+
+    // update the position attributes
+    target.setAttribute('data-x', x);
+    target.setAttribute('data-y', y);
+};
+
+/*
  * HTML MANIPULATION
  */
 var addToTable = function(widget) {
@@ -96,9 +124,11 @@ var addToTable = function(widget) {
     div.appendTo(gridcell);
 
     interact( "#" + div.attr("id") )
+        .draggable(interactInteractionDraggable)
         .resizable({
             edges: { left: false, right: '.widget-resize-handler', bottom: '.widget-resize-handler', top: false }
         })
+        .on( "dragmove", interactEventDragmove)
         .on('resizestart', function (event) {
             console.log("resize start", event);
         })
@@ -331,34 +361,12 @@ $(document).ready(function() {
  * interact.js related stuff
  */
 interact( "#widget-bar .widget" )
-    .draggable({
-        inertia: true,
-        autoScroll: true,
-        restrict: {
-            restriction: document.getElementById( "grid" ),
-            endOnly: true
-        }
-    })
-    .on( "dragmove", function(event) {
-        var target = event.target,
-            // keep the dragged position in the data-x/data-y attributes
-            x = (parseFloat(target.getAttribute('data-x')) || 0) + event.dx,
-            y = (parseFloat(target.getAttribute('data-y')) || 0) + event.dy;
-
-        // translate the element
-        target.style.webkitTransform =
-            target.style.transform =
-                'translate(' + x + 'px, ' + y + 'px)';
-
-        // update the position attributes
-        target.setAttribute('data-x', x);
-        target.setAttribute('data-y', y);
-    });
+    .draggable(interactInteractionDraggable)
+    .on( "dragmove", interactEventDragmove);
 
 interact( "#grid td" )
     .dropzone({
         accept: '.widget',
-        overlap: 0.1,
         ondropactivate: function(event) {
             // Maybe do something
         },
@@ -376,30 +384,46 @@ interact( "#grid td" )
 
             var gridcell = $(event.target),
                 element = $(event.relatedTarget);
-            var minCol = (parseInt(element.data( "min-width" )) || 2),
-                minRow = (parseInt(element.data( "min-height" )) || 2);
 
             var col = gridcell.index();
             var row = gridcell.parents().index();
 
-            addWidget({
-                position: {
-                    col: col,
-                    row: row
-                },
-                dimension: {
-                    col: minCol,
-                    row: minRow
-                },
-                type: element.data('widgetType')
-            });
+            var widget;
 
-            var relatedTarget = event.relatedTarget;
-            relatedTarget.setAttribute('data-x', 0);
-            relatedTarget.setAttribute('data-y', 0);
-            relatedTarget.style.webkitTransform =
-                relatedTarget.style.transform =
-                    'translate(0px, 0px)';
+            if (element.hasClass("initial")) {
+                var minCol = (parseInt(element.data( "min-width" )) || 2),
+                    minRow = (parseInt(element.data( "min-height" )) || 2);
+
+                widget = {
+                    position: {
+                        col: col,
+                        row: row
+                    },
+                    dimension: {
+                        col: minCol,
+                        row: minRow
+                    },
+                    type: element.data('widgetType')
+                };
+
+                var relatedTarget = event.relatedTarget;
+                relatedTarget.setAttribute('data-x', 0);
+                relatedTarget.setAttribute('data-y', 0);
+                relatedTarget.style.webkitTransform =
+                    relatedTarget.style.transform =
+                        'translate(0px, 0px)';
+            }
+            else {
+                widget = getWidget(element.data("widget-id"));
+                removeWidget(widget);
+                widget.position.col = col;
+                widget.position.row = row;
+            }
+
+            if (widget) {
+                addWidget(widget);
+            }
+
         },
         ondropdeactivate: function(event) {
             // Maybe do something
