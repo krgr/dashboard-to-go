@@ -80,6 +80,9 @@ var addToTable = function(widget) {
             div.find("label[for='grafana-widget-popup-form-panel']").attr("for", "grafana-widget-popup-form-panel-" + widget.id);
             div.find("#grafana-widget-popup-form-panel").attr("id", "grafana-widget-popup-form-panel-" + widget.id);
             iframe = div.find(".show-view iframe");
+            if (widget.data) {
+                iframe.attr("src", widget.data.url);
+            }
             iframe[0].height = height;
             iframe[0].width= width;
             break;
@@ -212,14 +215,19 @@ $(document).ready(function() {
                             success: function(data) {
                                 var i, len = data.length,
                                     dashboard,
-                                    found;
+                                    found,
+                                    title;
                                 grafanaSelectDashboard.empty();
                                 for (i=0; i<len; i+=1) {
                                     dashboard = data[i];
                                     if (widget.data.dashboard === dashboard.uri) {
                                         found = dashboard.uri;
                                     }
-                                    grafanaSelectDashboard.append("<option value=\"" + dashboard.uri + "\"" + (widget.data.dashboard === dashboard.uri ? " selected='\"selected\"'" : "") + ">" + dashboard.title + "</option>")
+                                    title = dashboard.title;
+                                    if (!title) {
+                                        title = dashboard.id;
+                                    }
+                                    grafanaSelectDashboard.append("<option value=\"" + dashboard.uri + "\"" + (widget.data.dashboard === dashboard.uri ? " selected=\"selected\"" : "") + ">" + title + "</option>")
                                 }
                                 grafanaSelectDashboard.attr("disabled", false);
                                 if (found) {
@@ -241,7 +249,8 @@ $(document).ready(function() {
                             success: function(data) {
                                 var panels = [],
                                     i, len = data.dashboard.rows.length,
-                                    panel;
+                                    panel,
+                                    title;
                                 for (i=0; i<len; i+=1) {
                                     Array.prototype.push.apply(panels,data.dashboard.rows[i].panels);
                                 }
@@ -249,7 +258,11 @@ $(document).ready(function() {
                                 grafanaSelectPanel.empty();
                                 for (i=0; i<len; i+=1) {
                                     panel = panels[i];
-                                    grafanaSelectPanel.append("<option value=\"" + panel.id + "\"" + (widget.data.panel === panel.id ? " selected='\"selected\"'" : "") + ">" + panel.title + "</option>")
+                                    title = panel.title;
+                                    if (!title) {
+                                        title = panel.id;
+                                    }
+                                    grafanaSelectPanel.append("<option value=\"" + panel.id + "\"" + (widget.data.panel === ''+panel.id ? " selected=\"selected\"" : "") + ">" + title + "</option>")
                                 }
                                 grafanaSelectPanel.attr("disabled", false);
                             },
