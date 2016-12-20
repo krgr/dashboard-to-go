@@ -72,6 +72,7 @@ body {
         }
         #grid td div.popup input { border: 1px solid #dddddd; }
     #widget-bar .widget {
+        background-color: #091c2d;
         border: 1px solid #394954; }
     #widget-templates { display: none; }
 
