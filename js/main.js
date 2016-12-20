@@ -26,36 +26,55 @@ var addToTable = function(widget) {
     var width = widget.dimension.col * cellWidth + 1,
         height = widget.dimension.row * cellHeight + 1;
 
-    var div = $('<div class="widget ' + widget.type +'"></div>');
+    var div = $("#widget-templates").find("." + widget.type).clone();
+    div.attr("id", "widget-" + widget.id);
+    div.data("widget-id", widget.id);
+    switch (widget.type) {
+        case "html-widget":
+            div.find("label[for='html-widget-popup-form-url']").attr("for", "html-widget-popup-form-url-" + widget.id);
+            div.find("#html-widget-popup-form-url").attr("id", "html-widget-popup-form-url-" + widget.id);
+            var iframe = div.find(".show-view iframe");
+            if (widget.data) {
+                iframe.attr("src", widget.data.url);
+            }
+            iframe[0].height = height;
+            iframe[0].width= width;
+            break;
+        default:
+            // Do nothing
+            break;
+    }
     div.width(width);
     div.height(height);
-
-    /* widget[0].innerHTML = '<img src="images/html.svg" />'; */
-    /* there shall be iframe magic instead of an image! */
 
     div.appendTo(gridcell);
 };
 
+var removeFromTable = function(widget) {
+    $("#widget-" + widget.id).remove();
+};
+
 var storage = {
         widgets: []
-    },
-    tmp;
+    };
 
 /*
  * LOCAL STORAGE
  */
 if (typeof(Storage) !== "undefined") {
+    var tmp;
     if (localStorage.dashboard2go) {
         tmp = JSON.parse(localStorage.dashboard2go);
     }
     if (tmp) {
         storage = tmp;
-        var widget,
-            i,
-            len = tmp.widgets.length;
-        for (i=0; i < len; i += 1) {
-            addToTable(tmp.widgets[i]);
-        }
+        $(document).ready(function() {
+            var widget,
+                i, len = storage.widgets.length;
+            for (i=0; i < len; i += 1) {
+                addToTable(tmp.widgets[i]);
+            }
+        });
     }
 }
 
@@ -68,29 +87,96 @@ var persist = function() {
 var addWidget = function(widget) {
     widget.id = generateUUID();
     storage.widgets.push(widget);
-    addToTable(widget);
     persist();
+    addToTable(widget);
 };
 
-$( ".action-edit").click(function() {
-    $( "main").toggleClass("edit");
-});
-$( ".action-edit-widget").click(function() {
-    $( ".widget").toggleClass("edit");
-});
-$( ".action-delete-widget").click(function() {
-    $( "main").toggleClass("edit");
-});
-$( ".action-cancel-widget-edit").click(function() {
-    $( ".widget").toggleClass("edit");
-});
-$( ".action-save-widget-edit").click(function() {
-    $( ".widget").toggleClass("edit");
-});
+var removeWidget = function(widget) {
+    var i, len = storage.widgets.length;
+    for (i=0; i< len; i += 1) {
+        if (widget.id === storage.widgets[i].id) {
+            break;
+        }
+    }
+    if (i < len) {
+        storage.widgets.splice(i, 1);
+        persist();
+        removeFromTable(widget);
+    }
+};
 
+var getWidget = function(id) {
+    var widget,
+        i, len = storage.widgets.length;
+    for (i=0; i< len; i += 1) {
+        if (id === storage.widgets[i].id) {
+            widget = storage.widgets[i];
+            break;
+        }
+    }
+    return widget;
+};
+
+var grid;
+
+$(document).ready(function() {
+    grid = $("#grid");
+
+    $( ".action-edit").click(function(event) {
+        $( "main").toggleClass("edit");
+        $( ".widget" ).toggleClass("show");
+    });
+
+    grid.on("click", ".action-edit-widget", function(event) {
+        var widgetElement =  $(event.target).parents(".widget");
+        var widget = getWidget(widgetElement.data("widget-id")),
+            popup = widgetElement.find(".popup");
+        if (widget.data) {
+            switch (widget.type) {
+                case "html-widget":
+                    popup.find("input[name='url']").val(widget.data.url);
+                    break;
+                default:
+                    // Do nothing
+                    break;
+            }
+        }
+        popup.toggle();
+    });
+    grid.on("click", ".action-delete-widget", function(event) {
+        var widget = getWidget($(event.target).parents(".widget").data("widget-id"));
+        if (widget) {
+            removeWidget(widget);
+        }
+    });
+    grid.on("click", ".action-cancel-widget-edit", function(event) {
+        $(event.target).parents(".popup").toggle();
+    });
+    grid.on("click", ".action-save-widget-edit", function(event) {
+        var widgetElement = $(event.target).parents(".widget");
+        widgetElement.find(".popup").toggle();
+        var widget = getWidget(widgetElement.data("widget-id"));
+        switch (widget.type) {
+            case "html-widget":
+                if (!widget.data) {
+                    widget.data = {};
+                }
+                widget.data.url = $(event.target).parents(".popup").find("input[name='url']").val();
+                widgetElement.find(".show-view iframe").attr("src", widget.data.url);
+                break;
+            default:
+                // Do nothing
+                break;
+        }
+        persist();
+    });
+
+    $( "#edit-action").trigger("click");
+});
 
 // TODO That's just a shortcut for development
-$( "main").toggleClass("edit");
+// $( "main").toggleClass("edit");
+// $( ".action-edit").click();
 
 /*
  * interact.js related stuff
