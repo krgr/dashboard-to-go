@@ -80,6 +80,9 @@ var addToTable = function(widget) {
             div.find("label[for='grafana-widget-popup-form-panel']").attr("for", "grafana-widget-popup-form-panel-" + widget.id);
             div.find("#grafana-widget-popup-form-panel").attr("id", "grafana-widget-popup-form-panel-" + widget.id);
             iframe = div.find(".show-view iframe");
+            if (widget.data) {
+                iframe.attr("src", widget.data.url);
+            }
             iframe[0].height = height;
             iframe[0].width= width;
             break;
