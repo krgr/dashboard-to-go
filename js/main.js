@@ -14,6 +14,29 @@ function generateUUID(){
     });
 }
 
+var storage = {
+        widgets: []
+    };
+
+/*
+ * LOCAL STORAGE
+ */
+if (typeof(Storage) !== "undefined") {
+    var tmp;
+    if (localStorage.dashboard2go) {
+        tmp = JSON.parse(localStorage.dashboard2go);
+    }
+    if (tmp) {
+        storage = tmp;
+    }
+}
+
+var persist = function() {
+    if (typeof(Storage) !== "undefined") {
+        localStorage.dashboard2go = JSON.stringify(storage);
+    }
+};
+
 /*
  * HTML MANIPULATION
  */
@@ -59,53 +82,30 @@ var addToTable = function(widget) {
             console.log("resize start", event);
         })
         .on('resizemove', function (event) {
-            console.log("resize move", event);
-            var target = event.target,
-                x = (parseFloat(target.getAttribute('data-x')) || 0),
-                y = (parseFloat(target.getAttribute('data-y')) || 0);
-            target.style.width  = Math.ceil(event.rect.width / cellWidth) * (cellWidth + 1) - 2 + 'px';
-            target.style.height = Math.ceil(event.rect.height / cellHeight) * (cellHeight + 1) - 2 + 'px';
+            // console.log("resize move", event);
+            var target = $(event.target);
 
+            var widgetCol = Math.ceil(event.rect.width / cellWidth);
+            var widgetRow = Math.ceil(event.rect.height / cellHeight);
+            target.width(widgetCol * (cellWidth + 1) - 2 + 'px');
+            target.height(widgetRow * (cellHeight + 1) - 2 + 'px');
+            var iframe = target.find(".show-view iframe");
+            iframe[0].width = target.width();
+            iframe[0].height = target.height();
+            var widget = getWidget(target.data("widget-id"));
+            widget.dimension = { col: widgetCol, row: widgetRow };
+            persist();
         })
         .on("resizeend", function(event) {
             console.log("resize end", event);
+            // resize iframe
             var target = $(event.target);
-            //adjust iframe size
+
         });
 };
 
 var removeFromTable = function(widget) {
     $("#widget-" + widget.id).remove();
-};
-
-var storage = {
-        widgets: []
-    };
-
-/*
- * LOCAL STORAGE
- */
-if (typeof(Storage) !== "undefined") {
-    var tmp;
-    if (localStorage.dashboard2go) {
-        tmp = JSON.parse(localStorage.dashboard2go);
-    }
-    if (tmp) {
-        storage = tmp;
-        $(document).ready(function() {
-            var widget,
-                i, len = storage.widgets.length;
-            for (i=0; i < len; i += 1) {
-                addToTable(tmp.widgets[i]);
-            }
-        });
-    }
-}
-
-var persist = function() {
-    if (typeof(Storage) !== "undefined") {
-        localStorage.dashboard2go = JSON.stringify(storage);
-    }
 };
 
 var addWidget = function(widget) {
@@ -144,6 +144,12 @@ var getWidget = function(id) {
 var grid;
 
 $(document).ready(function() {
+    var widget,
+        i, len = storage.widgets.length;
+    for (i=0; i < len; i += 1) {
+        addToTable(tmp.widgets[i]);
+    }
+
     grid = $("#grid");
 
     $( ".action-edit").click(function(event) {
