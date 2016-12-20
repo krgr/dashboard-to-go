@@ -44,6 +44,8 @@ body {
                 #grid td div.widget.show .show-view {  display: block;  }
         #grid td div.html-widget { background: #394954 url("../images/html.svg") no-repeat; }
             #grid td div.html-widget iframe { border: none; }
+        #grid td div.grafana-widget { background: #394954 url("../images/grafana.svg") no-repeat; }
+            #grid td div.grafana-widget iframe { border: none; }
         #grid td div.popup {
             display: none;
             top: 1em;
