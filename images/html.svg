@@ -16,5 +16,5 @@
         </mask>
     </defs>
     <!--rect width="80px" height="80px" fill="#091c2d" stroke="#283947" stroke-width="2px" /-->
-    <rect x="10px" y="15" width="50px" height="40px" fill="#00b741" mask="url(#stencil)" />
+    <rect x="10px" y="15px" width="50px" height="40px" fill="#00b741" mask="url(#stencil)" />
 </svg>

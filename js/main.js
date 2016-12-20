@@ -20,11 +20,13 @@ function generateUUID(){
 var addToTable = function(widget) {
     var gridcell = $($($('#grid').find('tr')[widget.position.row]).find('td')[widget.position.col]);
 
-    var cellWidth = parseInt(gridcell.width()),
-        cellHeight = parseInt(gridcell.height());
+    var cellWidth = parseFloat(gridcell.width()) + 1,
+        cellHeight = parseFloat(gridcell.height()) + 1,
+        cellX = parseFloat(gridcell.position().left),
+        cellY = parseFloat(gridcell.position().top);
 
-    var width = widget.dimension.col * cellWidth + 1,
-        height = widget.dimension.row * cellHeight + 1;
+    var width = widget.dimension.col * cellWidth,
+        height = widget.dimension.row * cellHeight;
 
     var div = $("#widget-templates").find("." + widget.type).clone();
     div.attr("id", "widget-" + widget.id);
@@ -48,6 +50,28 @@ var addToTable = function(widget) {
     div.height(height);
 
     div.appendTo(gridcell);
+
+    interact( "#" + div.attr("id") )
+        .resizable({
+            edges: { left: false, right: '.widget-resize-handler', bottom: '.widget-resize-handler', top: false }
+        })
+        .on('resizestart', function (event) {
+            console.log("resize start", event);
+        })
+        .on('resizemove', function (event) {
+            console.log("resize move", event);
+            var target = event.target,
+                x = (parseFloat(target.getAttribute('data-x')) || 0),
+                y = (parseFloat(target.getAttribute('data-y')) || 0);
+            target.style.width  = Math.ceil(event.rect.width / cellWidth) * (cellWidth + 1) - 2 + 'px';
+            target.style.height = Math.ceil(event.rect.height / cellHeight) * (cellHeight + 1) - 2 + 'px';
+
+        })
+        .on("resizeend", function(event) {
+            console.log("resize end", event);
+            var target = $(event.target);
+            //adjust iframe size
+        });
 };
 
 var removeFromTable = function(widget) {
