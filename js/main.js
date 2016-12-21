@@ -30,17 +30,61 @@ var defaultPage = generateUUID(),
  * LOCAL STORAGE
  */
 var persist = function() {
-    if (typeof(Storage) !== "undefined") {
-        localStorage.dashboard2go = JSON.stringify(storage);
+    try {
+        if (typeof(Storage) !== "undefined") {
+            localStorage.dashboard2go = JSON.stringify(storage);
+        }
+    }
+    catch (e) {
+        var expires = new Date();
+        expires.setTime(expires.getTime() + (365 * 24 * 60 * 60 * 1000));
+        document.cookie = "storage=" + btoa(JSON.stringify(storage)) + ";path=/;expires=" + expires.toUTCString();
+        console.log("Cookie written");
     }
 };
 
-if (typeof(Storage) !== "undefined") {
-    var tmp;
-    if (localStorage.dashboard2go) {
-        tmp = JSON.parse(localStorage.dashboard2go);
+var readFromCookie = function() {
+    var name = "storage=",
+        ca = document.cookie.split(';'),
+        data, tmp;
+    for(var i = 0; i <ca.length; i++) {
+        var c = ca[i];
+        while (c.charAt(0) == ' ') {
+            c = c.substring(1);
+        }
+        if (c.indexOf(name) == 0) {
+            data = c.substring(name.length, c.length);
+            break;
+        }
     }
-    storage = tmp || storage;
+    if (data) {
+        try {
+            tmp = JSON.parse(atob(data));
+            storage = tmp || storage;
+        }
+        catch (e) {
+            console.error(e);
+        }
+    }
+};
+
+try {
+    if (typeof(Storage) !== "undefined") {
+        var tmp;
+        if (localStorage.dashboard2go) {
+            tmp = JSON.parse(localStorage.dashboard2go);
+        }
+        else {
+            readFromCookie();
+        }
+        storage = tmp || storage;
+    }
+    else {
+        readFromCookie();
+    }
+}
+catch (e) {
+    readFromCookie();
 }
 
 /*
