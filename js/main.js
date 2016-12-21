@@ -26,7 +26,7 @@ var defaultPage = generateUUID(),
         config: {
             page: {
                 cols: 26,
-                rows: 12
+                rows: 16
             },
             widgets: {
                 grafana: {
@@ -44,7 +44,7 @@ var defaultPage = generateUUID(),
             page: {
                 landscape : {
                     cols: 26,
-                    rows: 12
+                    rows: 16
                 },
                 portrait: {
                     cols: 12,
@@ -290,7 +290,8 @@ var getShareAllPagesUrl = function() {
 var grid,
     prevPageButton, nextPageButton,
     addPageButton, removePageButton,
-    sharePageButton;
+    sharePageButton,
+    addRowButton, removeRowButton, addColumnButton, removeColumnButton;
 
 var currentPageIndex = function() {
     var i, len = storage.pages.length;
@@ -302,13 +303,16 @@ var currentPageIndex = function() {
     return i;
 };
 
-var refreshPage = function() {
-    var page = getPage(storage.page),
+var refreshPage = function(grid) {
+    var page = getPage(storage.page), widget,
         i, len = page.widgets.length;
 
     grid.find("div.widget").remove();
     for (i=0; i < len; i += 1) {
-        addToTable(page.widgets[i]);
+        widget = page.widgets[i];
+        if (widget.position.col < storage.config.page.cols && widget.position.row < storage.config.page.rows) {
+            addToTable(page.widgets[i]);
+        }
     }
 
     if (0 === currentPageIndex()) {
@@ -325,6 +329,24 @@ var refreshPage = function() {
     }
 };
 
+var refreshCells = function(grid) {
+    var i, j, tbody = $("<tbody></tbody>"), row;
+
+    grid.empty();
+
+    for (i=0; i<storage.config.page.rows; i+=1) {
+        row = $("<tr></tr>");
+        for (j=0; j<storage.config.page.cols; j+=1) {
+            $("<td></td>").appendTo(row);
+        }
+        row.appendTo(tbody);
+    }
+
+    tbody.appendTo(grid);
+
+    refreshPage(grid);
+};
+
 $(document).ready(function() {
     grid = $("#grid");
     prevPageButton = $("#page-left-action");
@@ -332,15 +354,19 @@ $(document).ready(function() {
     sharePageButton = $("#page-share-action");
     addPageButton = $("#page-add-action");
     removePageButton = $("#page-remove-action");
+    addRowButton = $("#row-add-action");
+    removeRowButton = $("#row-remove-action");
+    addColumnButton = $("#column-add-action");
+    removeColumnButton = $("#column-remove-action");
 
-    refreshPage();
+    refreshCells(grid);
 
     prevPageButton.on("click", function() {
         var i = currentPageIndex();
         if (0 < i) {
             storage.page = storage.pages[i-1].id;
             persist();
-            refreshPage();
+            refreshPage(grid);
         }
     });
     nextPageButton.on("click", function() {
@@ -348,7 +374,7 @@ $(document).ready(function() {
         if (i < len - 1) {
             storage.page = storage.pages[i+1].id;
             persist();
-            refreshPage();
+            refreshPage(grid);
         }
     });
 
@@ -362,7 +388,7 @@ $(document).ready(function() {
         storage.pages.push(page);
         storage.page = page.id;
         persist();
-        refreshPage();
+        refreshPage(grid);
     });
 
     removePageButton.on("click", function() {
@@ -378,13 +404,43 @@ $(document).ready(function() {
             }
             storage.page = storage.pages[i].id;
             persist();
-            refreshPage();
+            refreshPage(grid);
         }
     });
 
     new Clipboard("#page-share-action", {
         text: function() {
             return getSharePageUrl();
+        }
+    });
+
+    addRowButton.on("click", function() {
+        storage.config.page.rows += 1;
+        persist();
+        refreshCells(grid);
+    });
+
+    removeRowButton.on("click", function() {
+        if (storage.config.page.rows > 0) {
+            storage.config.page.rows -= 1;
+            persist();
+            refreshCells(grid);
+        }
+    });
+
+    addColumnButton.on("click", function() {
+        console.log("add column");
+        storage.config.page.cols += 1;
+        persist();
+        refreshCells(grid);
+    });
+
+    removeColumnButton.on("click", function() {
+        console.log("remove column");
+        if (storage.config.page.cols > 0) {
+            storage.config.page.cols -= 1;
+            persist();
+            refreshCells(grid);
         }
     });
 
