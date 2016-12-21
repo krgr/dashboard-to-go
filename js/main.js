@@ -31,8 +31,14 @@ var defaultPage = generateUUID(),
             widgets: {
                 grafana: {
                     base: {
-                        api: 'https://alpha.zmon.zalan.do/rest/grafana/api/',
-                        widget: 'https://alpha.zmon.zalan.do/grafana/dashboard-solo/'
+                        api: undefined,
+                        widget: undefined
+                    }
+                },
+                zmon: {
+                    base: {
+                        api: undefined,
+                        widget: undefined
                     }
                 }
             }
@@ -119,12 +125,14 @@ var addToTable = function(widget) {
     switch (widget.type) {
         case "html-widget":
             ids = ["html-widget-popup-form-url"];
-            div.find("label[for='html-widget-popup-form-url']").attr("for", "html-widget-popup-form-url-" + widget.id);
-            div.find("#html-widget-popup-form-url").attr("id", "html-widget-popup-form-url-" + widget.id);
             iframe = div.find(".show-view iframe");
             break;
         case "grafana-widget":
-            ids = ["grafana-widget-popup-form-url", "grafana-widget-popup-form-dashboard", "grafana-widget-popup-form-panel"];
+            ids = ["grafana-widget-popup-form-base-api", "grafana-widget-popup-form-base-widget", "grafana-widget-popup-form-dashboard", "grafana-widget-popup-form-panel"];
+            iframe = div.find(".show-view iframe");
+            break;
+        case "zmon-widget":
+            ids = ["zmon-widget-popup-form-base-api", "zmon-widget-popup-form-base-widget", "zmon-widget-popup-form-dashboard"];
             iframe = div.find(".show-view iframe");
             break;
         default:
@@ -187,14 +195,16 @@ var addToTable = function(widget) {
                         popup.find("input[name='url']").val(widget.data.url);
                         break;
                     case "grafana-widget":
-                        var grafanaInputBase = popup.find("input[name='url']"),
+                        var grafanaInputBaseApi = popup.find("input[name='api']"),
+                            grafanaInputBaseWidget = popup.find("input[name='widget']"),
                             grafanaSelectDashboard = popup.find("select[name='dashboard']"),
                             grafanaSelectPanel = popup.find("select[name='panel']");
                         grafanaSelectDashboard.attr("disabled", true);
                         grafanaSelectPanel.attr("disabled", true);
-                        grafanaInputBase.val(widget.data.base.api);
+                        grafanaInputBaseApi.val(widget.data.base.api);
+                        grafanaInputBaseWidget.val(widget.data.base.widget);
                         var refreshDashboards = function() {
-                            $.ajax(grafanaInputBase.val() + "search", {
+                            $.ajax(grafanaInputBaseApi.val() + "search", {
                                 crossDomain: true,
                                 xhrFields: {
                                     withCredentials: true
@@ -228,7 +238,7 @@ var addToTable = function(widget) {
                         };
 
                         var refreshPanels = function(dashboard) {
-                            $.ajax(grafanaInputBase.val() + "dashboards/" + dashboard, {
+                            $.ajax(grafanaInputBaseApi.val() + "dashboards/" + dashboard, {
                                 crossDomain: true,
                                 xhrFields: {
                                     withCredentials: true
@@ -258,7 +268,7 @@ var addToTable = function(widget) {
                                 }
                             })
                         };
-                        grafanaInputBase.on("change", function() {
+                        grafanaInputBaseApi.on("change", function() {
                             refreshDashboards();
                         });
                         grafanaSelectDashboard.on("change", function() {
@@ -266,13 +276,59 @@ var addToTable = function(widget) {
                         });
                         refreshDashboards();
                         break;
+                    case "zmon-widget":
+                        var zmonInputBaseApi = popup.find("input[name='api']"),
+                            zmonInputBaseWidget = popup.find("input[name='widget']"),
+                            zmonSelectDashboard = popup.find("select[name='dashboard']");
+                        zmonSelectDashboard.attr("disabled", true);
+                        zmonInputBaseApi.val(widget.data.base.api);
+                        zmonInputBaseWidget.val(widget.data.base.widget);
+                        var refreshZmonDashboards = function() {
+                            $.ajax(zmonInputBaseApi.val() + "allDashboards", {
+                                crossDomain: true,
+                                xhrFields: {
+                                    withCredentials: true
+                                },
+                                success: function(data) {
+                                    var i, len = data.length,
+                                        dashboard,
+                                        found,
+                                        title;
+                                    zmonSelectDashboard.empty();
+                                    for (i=0; i<len; i+=1) {
+                                        dashboard = data[i];
+                                        if (widget.data.dashboard === dashboard.id) {
+                                            found = dashboard.id;
+                                        }
+                                        title = dashboard.name;
+                                        if (!title) {
+                                            title = dashboard.id;
+                                        }
+                                        zmonSelectDashboard.append("<option value=\"" + dashboard.id + "\"" + (widget.data.dashboard === dashboard.id ? " selected=\"selected\"" : "") + ">" + title + "</option>")
+                                    }
+                                    zmonSelectDashboard.attr("disabled", false);
+                                },
+                                error: function(response) {
+                                    console.error(response);
+                                }
+                            })
+                        };
+                        zmonInputBaseApi.on("change", function() {
+                            refreshZmonDashboards();
+                        });
+                        refreshZmonDashboards();
+                        break;
                     default:
                         // Do nothing
                         break;
                 }
             }
             dialogContent.find(".popup").show();
-            dialog.show();
+            setTimeout(function() {
+                if (getWidget(widget.id)) {
+                    dialog.show();
+                }
+            }, 200);
             event.preventDefault();
         })
         .on("doubletap", function(event) {
@@ -309,6 +365,13 @@ var addWidget = function(widget) {
             if (!widget.data) {
                 widget.data = {
                     base: storage.config.widgets.grafana.base
+                };
+            }
+            break;
+        case "zmon-widget":
+            if (!widget.data) {
+                widget.data = {
+                    base: storage.config.widgets.zmon.base
                 };
             }
             break;
@@ -478,7 +541,11 @@ $(document).ready(function() {
     addColumnButton = $("#column-add-action");
     removeColumnButton = $("#column-remove-action");
 
+    console.log(grid);
+
     refreshCells(grid);
+
+    console.log("cells:",storage);
 
     prevPageButton.on("click", function() {
         var i = currentPageIndex();
@@ -580,7 +647,6 @@ $(document).ready(function() {
     dialogContent.on("click", ".action-save-widget-edit", function(event) {
         var widget = getWidget(dialog.data("widget-id"));
         var widgetElement = $("#widget-" + widget.id);
-        console.log(widgetElement);
         switch (widget.type) {
             case "html-widget":
                 if (!widget.data) {
@@ -593,12 +659,46 @@ $(document).ready(function() {
                 if (!widget.data) {
                     widget.data = {};
                 }
-                var popup = $(event.target).parents(".popup"),
-                    panel = popup.find("select[name='panel']").val(),
-                    dashboard = popup.find("select[name='dashboard']").val();
-                widget.data.url = widget.data.base.widget + dashboard + "?panelId=" + panel + "&fullscreen";
-                widget.data.dashboard = dashboard;
-                widget.data.panel = panel;
+                var grafanaPopup = $(event.target).parents(".popup"),
+                    grafanaPanel = grafanaPopup.find("select[name='panel']").val(),
+                    grafanaApi = grafanaPopup.find("input[name='api']").val(),
+                    grafanaWidget = grafanaPopup.find("input[name='widget']").val(),
+                    grafanaDashboard = grafanaPopup.find("select[name='dashboard']").val();
+                widget.data.url = grafanaWidget + grafanaDashboard + "?panelId=" + grafanaPanel + "&fullscreen";
+                widget.data.dashboard = grafanaDashboard;
+                widget.data.panel = grafanaPanel;
+                widget.data.base = {
+                    api: grafanaApi,
+                    widget: grafanaWidget
+                };
+                if (!storage.config.widgets.grafana.base.api) {
+                    storage.config.widgets.grafana.base.api = grafanaApi
+                }
+                if (!storage.config.widgets.grafana.base.widget) {
+                    storage.config.widgets.grafana.base.widget = grafanaWidget
+                }
+                widgetElement.find(".show-view iframe").attr("src", widget.data.url);
+                break;
+            case "zmon-widget":
+                if (!widget.data) {
+                    widget.data = {};
+                }
+                var zmonPopup = $(event.target).parents(".popup"),
+                    zmonApi = zmonPopup.find("input[name='api']").val(),
+                    zmonWidget = zmonPopup.find("input[name='widget']").val(),
+                    zmonDashboard = parseInt(zmonPopup.find("select[name='dashboard']").val());
+                widget.data.url = zmonWidget + zmonDashboard + "?compact=true";
+                widget.data.dashboard = zmonDashboard;
+                widget.data.base = {
+                    api: zmonApi,
+                    widget: zmonWidget
+                };
+                if (!storage.config.widgets.zmon.base.api) {
+                    storage.config.widgets.zmon.base.api = zmonApi
+                }
+                if (!storage.config.widgets.zmon.base.widget) {
+                    storage.config.widgets.zmon.base.widget = zmonWidget
+                }
                 widgetElement.find(".show-view iframe").attr("src", widget.data.url);
                 break;
             default:

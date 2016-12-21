@@ -77,6 +77,7 @@
                     <div class="popup">
                         <label for="html-widget-popup-form-url">URL:</label>
                         <input id="html-widget-popup-form-url" type="text" name="url" value="https://" />
+                        <br />
                         <i class="fa fa-check fa-fw action-save-widget-edit"></i>
                     </div>
                 </div>
@@ -89,14 +90,38 @@
                     <i class="fa fa-area-chart fa-fw fa-3x" ></i>
                     <img class="widget-resize-handler" src="images/handler.svg" />
                     <div class="popup">
-                        <label for="grafana-widget-popup-form-url">Base:</label>
-                        <input id="grafana-widget-popup-form-url" type="text" name="url" value="https://" />
+                        <label for="grafana-widget-popup-form-base-api">API Base:</label>
+                        <input id="grafana-widget-popup-form-base-api" type="text" name="api" value="https://" />
+                        <br />
+                        <label for="grafana-widget-popup-form-base-widget">Widget Base:</label>
+                        <input id="grafana-widget-popup-form-base-widget" type="text" name="widget" value="https://" />
                         <br />
                         <label for="grafana-widget-popup-form-dashboard">Dashboards:</label>
                         <select id="grafana-widget-popup-form-dashboard" name="dashboard"></select>
                         <br />
                         <label for="grafana-widget-popup-form-panel">Panels:</label>
                         <select id="grafana-widget-popup-form-panel" name="panel"></select>
+                        <br />
+                        <i class="fa fa-check fa-fw action-save-widget-edit"></i>
+                    </div>
+                </div>
+            </div>
+            <div class="widget show zmon-widget">
+                <div class="show-view">
+                    <iframe scrolling="no"></iframe>
+                </div>
+                <div class="edit-view">
+                    <i class="fa fa-area-chart fa-fw fa-3x" ></i>
+                    <img class="widget-resize-handler" src="images/handler.svg" />
+                    <div class="popup">
+                        <label for="zmon-widget-popup-form-base-api">API Base:</label>
+                        <input id="zmon-widget-popup-form-base-api" type="text" name="api" value="https://" />
+                        <br />
+                        <label for="zmon-widget-popup-form-base-widget">Widget Base:</label>
+                        <input id="zmon-widget-popup-form-base-widget" type="text" name="widget" value="https://" />
+                        <br />
+                        <label for="zmon-widget-popup-form-dashboard">Dashboards:</label>
+                        <select id="zmon-widget-popup-form-dashboard" name="dashboard"></select>
                         <br />
                         <i class="fa fa-check fa-fw action-save-widget-edit"></i>
                     </div>
