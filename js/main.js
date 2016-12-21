@@ -16,46 +16,12 @@ function generateUUID(){
 var defaultPage = generateUUID(),
     storage = {
         page: defaultPage,
-        pages: [
-            {
-                id: defaultPage,
-                title: "Default",
-                widgets: []
-            }
-        ],
+        pages: [ { id: defaultPage, widgets: [] } ],
         config: {
-            page: {
-                cols: 26,
-                rows: 16
-            },
+            page: { cols: 26, rows: 16 },
             widgets: {
-                grafana: {
-                    base: {
-                        api: undefined,
-                        widget: undefined
-                    }
-                },
-                zmon: {
-                    base: {
-                        api: undefined,
-                        widget: undefined
-                    }
-                }
-            }
-        }
-    },
-    // Some defaults we can offer to the user for configuration
-    defaults = {
-        config: {
-            page: {
-                landscape : {
-                    cols: 26,
-                    rows: 16
-                },
-                portrait: {
-                    cols: 12,
-                    rows: 26
-                }
+                grafana: { base: { api: undefined, widget: undefined } },
+                zmon: { base: { api: undefined, widget: undefined } }
             }
         }
     };
@@ -74,9 +40,7 @@ if (typeof(Storage) !== "undefined") {
     if (localStorage.dashboard2go) {
         tmp = JSON.parse(localStorage.dashboard2go);
     }
-    if (tmp) {
-        storage = tmp;
-    }
+    storage = tmp || storage;
 }
 
 /*
@@ -95,7 +59,7 @@ var getCanvasScale = function() {
     var canvas = document.getElementById("canvas");
     var matrix = window.getComputedStyle(canvas).transform;
     return parseFloat(matrix.replace(/[^0-9\-.,]/g, '').split(',')[0]);
-}
+};
 
 var interactEventDragmove = function(event) {
     var scale = getCanvasScale();
@@ -416,6 +380,15 @@ var getWidget = function(id) {
     }
 };
 
+var showNotification = function(text, timeout) {
+    timeout = timeout || 2500;
+    var notification = $("<div class=\"notification\">" + text + "</div>");
+    notification.appendTo($("body"));
+    setTimeout(function() {
+        notification.remove();
+    }, timeout);
+};
+
 /*
  * SHARING
  */
@@ -608,11 +581,7 @@ $(document).ready(function() {
             }
         })
         .on("success", function() {
-            var notification = $("<div class=\"notification\">Copied share URL to clipboard!</div>");
-            notification.appendTo($("body"));
-            setTimeout(function() {
-                notification.remove();
-            }, 2500);
+            showNotification("Copied share URL to clipboard!", 2500);
         });
 
     addRowButton.on("click", function() {
@@ -660,7 +629,13 @@ $(document).ready(function() {
                 if (!widget.data) {
                     widget.data = {};
                 }
-                widget.data.url = $(event.target).parents(".popup").find("input[name='url']").val();
+                var htmlPopup = $(event.target).parents(".popup"),
+                    htmlUrl = htmlPopup.find("input[name='url']").val();
+                if (!htmlUrl || 7 > htmlUrl.length) {
+                    showNotification("You need to set an URL!", 2500);
+                    return;
+                }
+                widget.data.url = htmlUrl;
                 widgetElement.find(".show-view iframe").attr("src", widget.data.url);
                 break;
             case "grafana-widget":
@@ -672,6 +647,18 @@ $(document).ready(function() {
                     grafanaApi = grafanaPopup.find("input[name='api']").val(),
                     grafanaWidget = grafanaPopup.find("input[name='widget']").val(),
                     grafanaDashboard = grafanaPopup.find("select[name='dashboard']").val();
+                if (!grafanaWidget || 7 > grafanaWidget.length) {
+                    showNotification("You need to set a Grafana Widget base URL!", 2500);
+                    return;
+                }
+                else if (!grafanaDashboard) {
+                    showNotification("You need to select a Grafana Dashboard!", 2500);
+                    return;
+                }
+                else if (!grafanaPanel) {
+                    showNotification("You need to select a Grafana Panel!", 2500);
+                    return;
+                }
                 widget.data.url = grafanaWidget + grafanaDashboard + "?panelId=" + grafanaPanel + "&fullscreen";
                 widget.data.dashboard = grafanaDashboard;
                 widget.data.panel = grafanaPanel;
@@ -695,6 +682,14 @@ $(document).ready(function() {
                     zmonApi = zmonPopup.find("input[name='api']").val(),
                     zmonWidget = zmonPopup.find("input[name='widget']").val(),
                     zmonDashboard = parseInt(zmonPopup.find("select[name='dashboard']").val());
+                if (!zmonWidget || 7 > zmonWidget.length) {
+                    showNotification("You need to set a ZMON Widget base URL!", 2500);
+                    return;
+                }
+                else if (!zmonDashboard) {
+                    showNotification("You need to select a ZMON Dashboard!", 2500);
+                    return;
+                }
                 widget.data.url = zmonWidget + zmonDashboard + "?compact=true";
                 widget.data.dashboard = zmonDashboard;
                 widget.data.base = {
