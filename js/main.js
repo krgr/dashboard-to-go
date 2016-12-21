@@ -204,6 +204,13 @@ var addToTable = function(widget) {
         if (widget) {
             removeWidget(widget);
         }
+    })
+    .on("tap", function(event) {
+        console.log('delete', event);
+        var widget = getWidget($(event.target).parents(".widget").data("widget-id"));
+        if (widget) {
+            removeWidget(widget);
+        }
     });
 };
 
