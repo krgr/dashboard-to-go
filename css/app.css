@@ -16,21 +16,17 @@ main article {
     #grid td div.popup { position: absolute; z-index: 999 }
     #grid td div.popup input { width: 200px; margin-left: 1px; }
     #grid td div.widget .widget-resize-handler { width: 3em; height: 3em; bottom: 0px; right: 0px; position: absolute; }
-    #sidebar-top, #sidebar-bottom {
-        position: absolute;
-        display: flex;
-        align-items: flex-end;
-        text-align: right;
+    #menu-bar { display: flex; width: 75%; margin: 0 auto; flex-direction: row-reverse; }
+    #menu-bar i { margin-right: 5px; }
+    .sidebar { position: absolute;
         right: 0;
         width: 80px;
-        height: 100%;
-    }
-    #sidebar-top {
-        top: 2px;
-        flex-direction: column; }
-    #sidebar-bottom {
-        bottom: 100px;
-        flex-direction: column-reverse; }
+        display: flex;
+        align-items: flex-end;
+        text-align: right; }
+    .sidebar i { margin-bottom: 5px; }
+    #sidebar-top { top: 2px; flex-direction: column; }
+    #sidebar-bottom { bottom: 90px; flex-direction: column-reverse; }
     #widget-bar {
         position: absolute;
         bottom: 0;
@@ -50,8 +46,10 @@ body {
 
     body.edit {
         background-color: #091c2d; }
-
-    article {
+/*    main {
+        display: flex;
+    }
+*/    article {
         background-color: rgba(0, 0, 0, 1);
         border: 1px solid #000000;
         -moz-osx-font-smoothing: grayscale; }
@@ -66,7 +64,7 @@ body {
         #grid td div.widget.show .edit-view {  display: none;  }
         #grid td div.widget.show .show-view {  display: block;  }
         #grid td div.html-widget iframe { border: none; overflow: hidden; }
-        body.edit #grid td div.html-widget { background: rgba(57, 73, 84, 0.7) url("../images/html.svg") no-repeat; }
+        body.edit #grid td div.html-widget { background: rgba(57, 73, 84, 0.7); }
         #grid td div.grafana-widget iframe { border: none; }
         body.edit #grid td div.grafana-widget { background: rgba(57, 73, 84, 0.7); }
         #grid td div.popup {
@@ -113,6 +111,9 @@ main #ok-action-clip {
     width: 0;
     height: 0; }
 main #ok-action {
+    position: absolute;
+    top: 0;
+    left: 0;
     cursor: default;
     -webkit-clip-path: polygon(0px 0px, 0px 90px, 90px 0px);
     clip-path: polygon(0px 0px, 0px 90px, 90px 0px);
