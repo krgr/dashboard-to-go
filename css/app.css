@@ -17,14 +17,14 @@ main article {
     #grid td div.popup input { width: 200px; margin-left: 1px; }
     #grid td div.widget .widget-resize-handler { width: 3em; height: 3em; bottom: 0px; right: 0px; position: absolute; }
     #menu-bar { display: flex; width: 75%; margin: 0 auto; flex-direction: row-reverse; }
-    #menu-bar i { margin-right: 5px; }
+    i.fa-table { align-self: center; }
+    #menu-bar i { margin-left: -10px; }
     .sidebar { position: absolute;
         right: 0;
-        width: 80px;
         display: flex;
         align-items: flex-end;
         text-align: right; }
-    .sidebar i { margin-bottom: 5px; }
+        .sidebar i.fa-table { margin-bottom: -10px; }
     #sidebar-top { top: 2px; flex-direction: column; }
     #sidebar-bottom { bottom: 90px; flex-direction: column-reverse; }
     #widget-bar {
@@ -93,17 +93,8 @@ body {
     body.edit article {
         transform: scale(0.6) !important; }
 }
-@media only screen
-  and (orientation: portrait) {
-    #grid td:nth-of-type(1n+17) {
-        display: none; } }
-@media only screen
-  and (orientation: landscape) {
-    #grid tr:nth-of-type(1n+17) {
-        display: none; } }
 
 /* Interaction */
-
 body {
     transition-duration: 0.3s;
     transition-property: background-color; }
