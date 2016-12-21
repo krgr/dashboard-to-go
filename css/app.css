@@ -113,6 +113,22 @@ body.edit #widget-bar {
 body.edit #ok-action {
     opacity: 1; }
 
+#edit-action, #page-left-action, #page-right-action {
+    position: absolute;
+    opacity: 0.7;
+    z-index: 100000; }
+#page-left-action {
+    bottom: 2px;
+    left: 0; }
+#page-right-action {
+    bottom: 2px;
+    right: 0; }
+#edit-action {
+    top: 2px;
+    left: 3px;
+    transition-duration: 0.3s;
+    transition-property: opacity; }
+
 body.edit article {
     transform: scale(0.75); }
 
@@ -120,14 +136,6 @@ body.edit article {
         background-color: white;
     }
 
-    article #edit-action {
-        position: absolute;
-        top: 2px;
-        left: 3px;
-        opacity: 0.7;
-        z-index: 100000;
-        transition-duration: 0.3s;
-        transition-property: opacity; }
     body.edit article #edit-action {
         opacity: 0;
         pointer-events: none; }
