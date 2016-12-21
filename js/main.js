@@ -394,17 +394,19 @@ $(document).ready(function() {
 
     removePageButton.on("click", function() {
         var i = currentPageIndex();
-        storage.pages.splice(i,1);
-        if (0 === storage.pages.length) {
-            addPageButton.trigger("click");
-            return;
+        if (confirm("Do you really want to remove the current page?")) {
+            storage.pages.splice(i,1);
+            if (0 === storage.pages.length) {
+                addPageButton.trigger("click");
+                return;
+            }
+            if (i === storage.pages.length) {
+                i -= 1;
+            }
+            storage.page = storage.pages[i].id;
+            persist();
+            refreshPage();
         }
-        if (i === storage.pages.length) {
-            i -= 1;
-        }
-        storage.page = storage.pages[i].id;
-        persist();
-        refreshPage();
     });
 
     new Clipboard("#page-share-action", {
