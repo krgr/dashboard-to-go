@@ -314,71 +314,98 @@ var getShareAllPagesUrl = function() {
 
 var grid,
     prevPageButton, nextPageButton,
-    sharePageButton;
+    addPageButton, removePageButton;
+
+var currentPageIndex = function() {
+    var i, len = storage.pages.length;
+    for (i=0; i<len; i+=1) {
+        if (storage.page === storage.pages[i].id) {
+            break;
+        }
+    }
+    return i;
+};
 
 var refreshPage = function() {
 
     var page = getPage(storage.page),
         i, len = page.widgets.length;
 
-    grid.remove("div.widget");
+    grid.find("div.widget").remove();
     for (i=0; i < len; i += 1) {
         addToTable(page.widgets[i]);
+    }
+
+    if (0 === currentPageIndex()) {
+        prevPageButton.hide();
+    }
+    else {
+        prevPageButton.show();
+    }
+    if (storage.pages.length - 1 === currentPageIndex()) {
+        nextPageButton.hide();
+    }
+    else {
+        nextPageButton.show();
     }
 };
 
 $(document).ready(function() {
 
-    var widget,
-        currentPageIndex = function() {
-            var i, len = storage.pages.length;
-            for (i=0; i<len; i+=1) {
-                if (storage.page === storage.pages[i].id) {
-                    break;
-                }
-            }
-            return i;
-        },
-        updatePageButtonsVisibility = function() {
-            if (0 === currentPageIndex()) {
-                prevPageButton.hide();
-            }
-            else {
-                prevPageButton.show();
-            }
-            if (storage.pages.length - 1 === currentPageIndex()) {
-                nextPageButton.hide();
-            }
-            else {
-                nextPageButton.show();
-            }
-        };
+    var widget;
 
     grid = $("#grid");
     prevPageButton = $("#page-left-action");
     nextPageButton = $("#page-right-action");
-    sharePageButton = $("#page-share-action");
+    addPageButton = $("#page-add-action");
+    removePageButton = $("#page-remove-action");
 
     refreshPage();
-
-    updatePageButtonsVisibility();
 
     prevPageButton.on("click", function() {
         var i = currentPageIndex();
         if (0 < i) {
             storage.page = storage.pages[i-1].id;
-            refreshPage();
-            updatePageButtonsVisibility();
             persist();
+            refreshPage();
         }
     });
     nextPageButton.on("click", function() {
         var i = currentPageIndex(), len = storage.pages.length;
         if (i < len - 1) {
             storage.page = storage.pages[i+1].id;
-            refreshPage();
-            updatePageButtonsVisibility();
             persist();
+            refreshPage();
+        }
+    });
+
+    addPageButton.on("click", function() {
+        console.log('addPageButton');
+        var page = {
+            id: generateUUID(),
+            title: "Default",
+            widgets: []
+        };
+        storage.pages.push(page);
+        storage.page = page.id;
+        persist();
+        refreshPage();
+    });
+
+    removePageButton.on("click", function() {
+        var i = currentPageIndex();
+        if (confirm("Do you really want to remove the current page?")) {
+            storage.pages.splice(i,1);
+            if (0 === storage.pages.length) {
+                addPageButton.trigger("click");
+                return;
+            }
+            if (i === storage.pages.length) {
+                i -= 1;
+            }
+            storage.page = storage.pages[i].id;
+            persist();
+            refreshPage();
         }
     });
 
