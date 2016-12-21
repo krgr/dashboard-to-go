@@ -91,11 +91,18 @@ var interactInteractionDraggable = {
     }
 };
 
+var getCanvasScale = function() {
+    var canvas = document.getElementById("canvas");
+    var matrix = window.getComputedStyle(canvas).transform;
+    return parseFloat(matrix.replace(/[^0-9\-.,]/g, '').split(',')[0]);
+}
+
 var interactEventDragmove = function(event) {
+    var scale = getCanvasScale();
     var target = event.target,
         // keep the dragged position in the data-x/data-y attributes
-        x = (parseFloat(target.getAttribute('data-x')) || 0) + event.dx,
-        y = (parseFloat(target.getAttribute('data-y')) || 0) + event.dy;
+        x = (parseFloat(target.getAttribute('data-x')) || 0) + (event.dx / scale),
+        y = (parseFloat(target.getAttribute('data-y')) || 0) + (event.dy / scale);
     // translate the element
     target.style.webkitTransform =
         target.style.transform =
@@ -163,9 +170,10 @@ var addToTable = function(widget) {
         })
         .on('dragmove', interactEventDragmove)
         .on('resizemove', function (event) {
+            var scale = getCanvasScale();
             var iframe, target = $(event.target),
-                widgetCol = Math.ceil(event.rect.width / cellWidth),
-                widgetRow = Math.ceil(event.rect.height / cellHeight);
+                widgetCol = Math.floor(event.rect.width / cellWidth / scale),
+                widgetRow = Math.floor(event.rect.height / cellHeight / scale);
             target.width(widgetCol * cellWidth - 2 + 'px');
             target.height(widgetRow * cellHeight - 2 + 'px');
             // resize iframe
