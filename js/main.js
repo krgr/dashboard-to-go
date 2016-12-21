@@ -624,7 +624,7 @@ $(document).ready(function() {
     dialog.on("click", ".action-cancel-widget-edit", function(event) {
         dialog.hide();
     });
-    dialogContent.on("click", ".action-save-widget-edit", function(event) {
+    dialog.on("click", ".action-save-widget-edit", function(event) {
         var widget = getWidget(dialog.data("widget-id"));
         var widgetElement = $("#widget-" + widget.id);
         switch (widget.type) {
