@@ -39,9 +39,6 @@ main article {
     #widget-bar img { width: 70px; height: 70px; margin: 0 2px; }
     #widget-bar i { width: 70px; height: 60px; margin: 0 2px; padding-top: 10px; }
 
-/* Quirks fixes */
-div.widget, div.edit-view, div.edit-view i { cursor: pointer !important; } /* iOS mouse event bubbling */
-
 /* Design */
 body {
     color: gray;
