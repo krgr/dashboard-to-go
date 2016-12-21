@@ -62,8 +62,11 @@ var getCanvasScale = function() {
 };
 
 var interactEventDragmove = function(event) {
-    var scale = getCanvasScale();
-    var target = event.target,
+    var scale = 1;
+    if (!event.target.classList.contains('initial')) {
+        scale = getCanvasScale();
+    }
+    var target = event.target;
         // keep the dragged position in the data-x/data-y attributes
         x = (parseFloat(target.getAttribute('data-x')) || 0) + (event.dx / scale),
         y = (parseFloat(target.getAttribute('data-y')) || 0) + (event.dy / scale);
