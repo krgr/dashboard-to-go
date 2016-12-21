@@ -77,6 +77,10 @@ body {
 @media (max-width: 500px) {
     body.edit article {
         transform: scale(0.6) !important; }
+    .popup input, .popup select {
+        width: 90% !important;
+    }
+
 }
 
 /* Interaction */
@@ -102,12 +106,9 @@ main #ok-action {
     transition-duration: 0.3s;
     transition-property: opacity;
     opacity: 0; }
-body.edit #widget-bar {
-    z-index: 100000; }
+body.edit #widget-bar { z-index: 100000; }
 
-body.edit #ok-action {
-    opacity: 1; }
-
+body.edit #ok-action { opacity: 1; }
 #edit-action, #page-left-action, #page-right-action {
     position: absolute;
     opacity: .7;
@@ -153,7 +154,6 @@ body.edit article {
     -moz-box-shadow:    0 0 5px black;
     box-shadow:         0 0 5px black;
 }
-
 #dialog {
     display: none;
     cursor: default;
@@ -165,13 +165,15 @@ body.edit article {
     right: 0;
     bottom: 0;
 }
-.popup label, .popup input, .popup select {
-    display: block;
-}
-.popup input, .popup select {
-    width: 80%;
-}
-
+.popup label, .popup input, .popup select { display: block; }
+.popup input, .popup select { width: 80%; }
+.popup input {
+    border-width: 1px;
+    border-style: solid;
+    -moz-border-radius: 0.2em;
+    -webkit-border-radius: 0.2em;
+    border-radius: 0.2em; /* future proofing */
+    -khtml-border-radius: 0.2em; /* for old Konqueror browsers */ }
 #dialog .content {
     background-color: lightgray;
     position: absolute;
@@ -188,12 +190,5 @@ body.edit article {
     -webkit-border-radius: 10px;
     border-radius: 10px; /* future proofing */
     -khtml-border-radius: 10px; /* for old Konqueror browsers */ }
-
-#dialog .content .fa.fa-close, #dialog .content .fa-check {
-    align-self: flex-end;
-}
-
-fieldset legend {
-    margin-bottom: 1em;
-    font-weight: bold;
-}
+#dialog .content .fa.fa-close, #dialog .content .fa-check { align-self: flex-end; }
+fieldset legend { margin-bottom: 1em; font-weight: bold; }
