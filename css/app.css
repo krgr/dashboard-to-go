@@ -168,3 +168,31 @@ body.edit article {
     -moz-box-shadow:    0 0 5px black;
     box-shadow:         0 0 5px black;
 }
+
+#dialog {
+    display: none;
+    cursor: default;
+    z-index: 999999;
+    position: absolute;
+    background-color: rgba(211,211,211,0.5);
+    left: 0;
+    top: 0;
+    right: 0;
+    bottom: 0;
+}
+
+#dialog .content {
+    background-color: white;
+    position: absolute;
+    padding: 5%;
+    left: 10%;
+    right: 10%;
+    top: 10%;
+    bottom: 10%;
+}
+
+#dialog .content .fa.fa-close {
+    position: absolute;
+    right: 5px;
+    top: 5px;
+}
