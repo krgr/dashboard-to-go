@@ -1,7 +1,6 @@
 /*
  * HELPER FUNCTIONS
  */
-
 function generateUUID(){
     var d = new Date().getTime();
     if(window.performance && typeof window.performance.now === "function"){
@@ -70,26 +69,6 @@ if (typeof(Storage) !== "undefined") {
         tmp = JSON.parse(localStorage.dashboard2go);
     }
     if (tmp) {
-        var migrate = false;
-        if (!tmp.config) {
-            tmp.config = storage.config;
-            migrate = true;
-        }
-        if (!tmp.pages) {
-            tmp.page = generateUUID();
-            tmp.pages = [];
-            tmp.pages.push({
-                id: tmp.page,
-                title: "Default",
-                widgets: tmp.widgets
-            });
-            migrate = true;
-        }
-
-        if (migrate) {
-            persist();
-        }
-
         storage = tmp;
     }
 }
@@ -128,44 +107,41 @@ var addToTable = function(widget) {
     var gridcell = $($($('#grid').find('tr')[widget.position.row]).find('td')[widget.position.col]);
 
     var cellWidth = parseFloat(gridcell.width()) + 2,
-        cellHeight = parseFloat(gridcell.height()) + 2,
-        cellX = parseFloat(gridcell.position().left),
-        cellY = parseFloat(gridcell.position().top);
+        cellHeight = parseFloat(gridcell.height()) + 2;
 
     var width = widget.dimension.col * cellWidth - 2,
         height = widget.dimension.row * cellHeight - 2;
 
-    var div = $("#widget-templates").find("." + widget.type).clone(), iframe;
+    var div = $("#widget-templates").find("." + widget.type).clone(),
+        iframe, id, ids;
     div.attr("id", "widget-" + widget.id);
     div.data("widget-id", widget.id);
     switch (widget.type) {
         case "html-widget":
+            ids = ["html-widget-popup-form-url"];
             div.find("label[for='html-widget-popup-form-url']").attr("for", "html-widget-popup-form-url-" + widget.id);
             div.find("#html-widget-popup-form-url").attr("id", "html-widget-popup-form-url-" + widget.id);
             iframe = div.find(".show-view iframe");
-            if (widget.data) {
-                iframe.attr("src", widget.data.url);
-            }
-            iframe[0].height = height;
-            iframe[0].width= width;
             break;
         case "grafana-widget":
-            div.find("label[for='grafana-widget-popup-form-url']").attr("for", "grafana-widget-popup-form-url-" + widget.id);
-            div.find("#grafana-widget-popup-form-url").attr("id", "grafana-widget-popup-form-url-" + widget.id);
-            div.find("label[for='grafana-widget-popup-form-dashboard']").attr("for", "grafana-widget-popup-form-dashboard-" + widget.id);
-            div.find("#grafana-widget-popup-form-dashboard").attr("id", "grafana-widget-popup-form-dashboard-" + widget.id);
-            div.find("label[for='grafana-widget-popup-form-panel']").attr("for", "grafana-widget-popup-form-panel-" + widget.id);
-            div.find("#grafana-widget-popup-form-panel").attr("id", "grafana-widget-popup-form-panel-" + widget.id);
+            ids = ["grafana-widget-popup-form-url", "grafana-widget-popup-form-dashboard", "grafana-widget-popup-form-panel"];
             iframe = div.find(".show-view iframe");
-            if (widget.data) {
-                iframe.attr("src", widget.data.url);
-            }
-            iframe[0].height = height;
-            iframe[0].width= width;
             break;
         default:
-            // Do nothing
+            iframe = undefined;
+            ids = [];
             break;
+    }
+    for (id in ids) {
+        div.find("label[for='" + id + "']").attr("for", id + "-" + widget.id);
+        div.find("#" + id).attr("id", id + "-" + widget.id);
+    }
+    if (iframe) {
+        if (widget.data) {
+            iframe.attr("src", widget.data.url);
+        }
+        iframe[0].height = height;
+        iframe[0].width= width;
     }
     div.width(width);
     div.height(height);
@@ -179,17 +155,16 @@ var addToTable = function(widget) {
         })
         .on('dragmove', interactEventDragmove)
         .on('resizemove', function (event) {
-            var target = $(event.target);
-            var widgetCol = Math.ceil(event.rect.width / cellWidth);
-            var widgetRow = Math.ceil(event.rect.height / cellHeight);
+            var iframe, target = $(event.target),
+                widgetCol = Math.ceil(event.rect.width / cellWidth),
+                widgetRow = Math.ceil(event.rect.height / cellHeight);
             target.width(widgetCol * cellWidth - 2 + 'px');
             target.height(widgetRow * cellHeight - 2 + 'px');
             // resize iframe
-            var iframe = target.find(".show-view iframe");
+            iframe = target.find(".show-view iframe");
             iframe[0].width = target.width();
             iframe[0].height = target.height();
-            var widget = getWidget(target.data("widget-id"));
-            widget.dimension = { col: widgetCol, row: widgetRow };
+            getWidget(target.data("widget-id")).dimension = { col: widgetCol, row: widgetRow };
         })
         .on("resizeend", function(event) {
             persist();
@@ -314,7 +289,8 @@ var getShareAllPagesUrl = function() {
 
 var grid,
     prevPageButton, nextPageButton,
-    addPageButton, removePageButton;
+    addPageButton, removePageButton,
+    sharePageButton;
 
 var currentPageIndex = function() {
     var i, len = storage.pages.length;
@@ -327,7 +303,6 @@ var currentPageIndex = function() {
 };
 
 var refreshPage = function() {
-
     var page = getPage(storage.page),
         i, len = page.widgets.length;
 
@@ -351,12 +326,10 @@ var refreshPage = function() {
 };
 
 $(document).ready(function() {
-
-    var widget;
-
     grid = $("#grid");
     prevPageButton = $("#page-left-action");
     nextPageButton = $("#page-right-action");
+    sharePageButton = $("#page-share-action");
     addPageButton = $("#page-add-action");
     removePageButton = $("#page-remove-action");
 
@@ -620,6 +593,5 @@ interact( "#grid td" )
             if (widget) {
                 addWidget(widget);
             }
-
         }
     });
