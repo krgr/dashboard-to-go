@@ -63,9 +63,8 @@ body {
         #grid td div.widget .show-view {  display: none;  }
         #grid td div.widget.show .edit-view {  display: none;  }
         #grid td div.widget.show .show-view {  display: block;  }
-        #grid td div.html-widget iframe { border: none; overflow: hidden; }
+        #grid div iframe { border: none; overflow: hidden; }
         body.edit #grid td div.html-widget { background: rgba(57, 73, 84, 0.7); }
-        #grid td div.grafana-widget iframe { border: none; }
         body.edit #grid td div.grafana-widget { background: rgba(57, 73, 84, 0.7); }
         #grid td div.popup {
             display: none; }
@@ -166,6 +165,12 @@ body.edit article {
     right: 0;
     bottom: 0;
 }
+.popup label, .popup input, .popup select {
+    display: block;
+}
+.popup input, .popup select {
+    width: 80%;
+}
 
 #dialog .content {
     background-color: lightgray;
@@ -186,4 +191,9 @@ body.edit article {
 
 #dialog .content .fa.fa-close, #dialog .content .fa-check {
     align-self: flex-end;
+}
+
+fieldset legend {
+    margin-bottom: 1em;
+    text-decoration: underline;
 }

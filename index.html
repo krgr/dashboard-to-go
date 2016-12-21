@@ -73,8 +73,11 @@
                     <i class="fa fa-code fa-fw fa-3x" ></i>
                     <img class="widget-resize-handler" src="images/handler.svg" />
                     <div class="popup">
-                        <label for="html-widget-popup-form-url">URL:</label>
-                        <input id="html-widget-popup-form-url" type="text" name="url" value="https://" />
+                        <fieldset>
+                            <legend>External page configuration</legend>
+                            <label for="html-widget-popup-form-url">Page URL:</label>
+                            <input id="html-widget-popup-form-url" type="text" name="url" />
+                        </fieldset>
                     </div>
                 </div>
             </div>
@@ -86,14 +89,36 @@
                     <i class="fa fa-area-chart fa-fw fa-3x" ></i>
                     <img class="widget-resize-handler" src="images/handler.svg" />
                     <div class="popup">
-                        <label for="grafana-widget-popup-form-url">Base:</label>
-                        <input id="grafana-widget-popup-form-url" type="text" name="url" value="https://" />
-                        <br />
-                        <label for="grafana-widget-popup-form-dashboard">Dashboards:</label>
-                        <select id="grafana-widget-popup-form-dashboard" name="dashboard"></select>
-                        <br />
-                        <label for="grafana-widget-popup-form-panel">Panels:</label>
-                        <select id="grafana-widget-popup-form-panel" name="panel"></select>
+                        <fieldset>
+                            <legend>Grafana configuration</legend>
+                            <label for="grafana-widget-popup-form-base-api">API Base URL:</label>
+                            <input id="grafana-widget-popup-form-base-api" type="text" name="api" />
+                            <label for="grafana-widget-popup-form-base-widget">Widget Base URL:</label>
+                            <input id="grafana-widget-popup-form-base-widget" type="text" name="widget" />
+                            <label for="grafana-widget-popup-form-dashboard">Dashboards:</label>
+                            <select id="grafana-widget-popup-form-dashboard" name="dashboard"></select>
+                            <label for="grafana-widget-popup-form-panel">Panels:</label>
+                            <select id="grafana-widget-popup-form-panel" name="panel"></select>
+                        </fieldset>
+                    </div>
+                </div>
+            </div>
+            <div class="widget show zmon-widget">
+                <div class="show-view">
+                    <iframe scrolling="no"></iframe>
+                </div>
+                <div class="edit-view">
+                    <i class="fa fa-bar-chart fa-fw fa-3x" ></i>
+                    <img class="widget-resize-handler" src="images/handler.svg" />
+                    <div class="popup">
+                        <fieldset>
+                            <legend>ZMON configuration</legend>
+                            <label for="zmon-widget-popup-form-base-api">API Base URL:</label>
+                            <input id="zmon-widget-popup-form-base-api" type="text" name="api" />
+                            <label for="zmon-widget-popup-form-base-widget">Widget Base URL:</label>
+                            <input id="zmon-widget-popup-form-base-widget" type="text" name="widget" />
+                            <label for="zmon-widget-popup-form-dashboard">Dashboards:</label>
+                            <select id="zmon-widget-popup-form-dashboard" name="dashboard"></select>
                     </div>
                 </div>
             </div>
