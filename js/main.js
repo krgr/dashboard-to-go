@@ -107,6 +107,7 @@ var interactInteractionDraggable = {
 };
 
 var interactEventDragmove = function(event) {
+    console.log('drag', event);
     var target = event.target,
         // keep the dragged position in the data-x/data-y attributes
         x = (parseFloat(target.getAttribute('data-x')) || 0) + event.dx,
@@ -172,13 +173,6 @@ var addToTable = function(widget) {
 
     div.appendTo(gridcell);
 
-    div.find(".action-delete-widget").on("click", function(event) {
-        var widget = getWidget($(event.target).parents(".widget").data("widget-id"));
-        if (widget) {
-            removeWidget(widget);
-        }
-    });
-
     interact( "#" + div.attr("id") )
         .draggable(interactInteractionDraggable)
         .resizable({
@@ -203,6 +197,14 @@ var addToTable = function(widget) {
             var iframe = $(event.target).find(".show-view iframe");
             iframe.attr("src", iframe.attr("src"));
         });
+
+    div.find(".action-delete-widget").on("click", function(event) {
+        console.log('delete', event);
+        var widget = getWidget($(event.target).parents(".widget").data("widget-id"));
+        if (widget) {
+            removeWidget(widget);
+        }
+    });
 };
 
 var removeFromTable = function(widget) {
