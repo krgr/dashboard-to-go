@@ -254,8 +254,67 @@ var getWidget = function(id) {
     }
 };
 
+/*
+ * SHARING
+ */
+if (window.location.hash) {
+    var scrollV, scrollH,
+        data = window.location.hash.substr(1),
+        json,
+        addOrReplacePage = function(page) {
+            var existingPage = getPage(page.id);
+            if (existingPage) {
+                existingPage.widgets = page.widgets;
+                storage.page = page.id;
+            }
+            else {
+                storage.pages.push(json.page);
+                storage.page = json.page.id;
+            }
+        };
+    if (data) {
+        json = JSON.parse(atob(data));
+        if (json.page) {
+            addOrReplacePage(json.page);
+        }
+        else if (json.pages) {
+            var i, len = json.pages.length;
+            for (i=0; i<len; i+=1) {
+                addOrReplacePage(json.pages[i]);
+            }
+        }
+        persist();
+    }
+    if ("pushState" in history)
+        history.pushState("", document.title, window.location.pathname + window.location.search);
+    else {
+        // Prevent scrolling by storing the page's current scroll offset
+        scrollV = document.body.scrollTop;
+        scrollH = document.body.scrollLeft;
+
+        location.hash = "";
+
+        // Restore the scroll offset, should be flicker free
+        document.body.scrollTop = scrollV;
+        document.body.scrollLeft = scrollH;
+    }
+}
+
+var getSharePageUrl = function() {
+    var uri = window.location.href;
+    uri += "#" + btoa(JSON.stringify({page: getPage(storage.page)}));
+    return uri;
+};
+
+var getShareAllPagesUrl = function() {
+    var uri = window.location.href;
+    uri += "#" + btoa(JSON.stringify({pages: storage.pages}));
+    return uri;
+};
+
 var grid,
-    prevPageButton, nextPageButton;
+    prevPageButton, nextPageButton,
+    sharePageButton;
 
 var refreshPage = function() {
 
@@ -298,6 +357,7 @@ $(document).ready(function() {
     grid = $("#grid");
     prevPageButton = $("#page-left-action");
     nextPageButton = $("#page-right-action");
+    sharePageButton = $("#page-share-action");
 
     refreshPage();
 
@@ -319,6 +379,12 @@ $(document).ready(function() {
             refreshPage();
             updatePageButtonsVisibility();
             persist();
+        }
+    });
+
+    new Clipboard("#page-share-action", {
+        text: function() {
+            return getSharePageUrl();
         }
     });
 
