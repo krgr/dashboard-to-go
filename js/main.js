@@ -254,17 +254,73 @@ var getWidget = function(id) {
     }
 };
 
-var grid;
+var grid,
+    prevPageButton, nextPageButton;
 
-$(document).ready(function() {
-    var widget,
-        page = getPage(storage.page),
+var refreshPage = function() {
+
+    var page = getPage(storage.page),
         i, len = page.widgets.length;
+
+    grid.remove("div.widget");
     for (i=0; i < len; i += 1) {
         addToTable(page.widgets[i]);
     }
+};
+
+$(document).ready(function() {
+
+    var widget,
+        currentPageIndex = function() {
+            var i, len = storage.pages.length;
+            for (i=0; i<len; i+=1) {
+                if (storage.page === storage.pages[i].id) {
+                    break;
+                }
+            }
+            return i;
+        },
+        updatePageButtonsVisibility = function() {
+            if (0 === currentPageIndex()) {
+                prevPageButton.hide();
+            }
+            else {
+                prevPageButton.show();
+            }
+            if (storage.pages.length - 1 === currentPageIndex()) {
+                nextPageButton.hide();
+            }
+            else {
+                nextPageButton.show();
+            }
+        };
 
     grid = $("#grid");
+    prevPageButton = $("#page-left-action");
+    nextPageButton = $("#page-right-action");
+
+    refreshPage();
+
+    updatePageButtonsVisibility();
+
+    prevPageButton.on("click", function() {
+        var i = currentPageIndex();
+        if (0 < i) {
+            storage.page = storage.pages[i-1].id;
+            refreshPage();
+            updatePageButtonsVisibility();
+            persist();
+        }
+    });
+    nextPageButton.on("click", function() {
+        var i = currentPageIndex(), len = storage.pages.length;
+        if (i < len - 1) {
+            storage.page = storage.pages[i+1].id;
+            refreshPage();
+            updatePageButtonsVisibility();
+            persist();
+        }
+    });
 
     $( ".action-edit").click(function(event) {
         $( "body").toggleClass("edit");
