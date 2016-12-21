@@ -170,6 +170,119 @@ var addToTable = function(widget) {
             persist();
             var iframe = $(event.target).find(".show-view iframe");
             iframe.attr("src", iframe.attr("src"));
+        })
+        .on("tap", function(event) {
+            var widgetElement =  $(event.target);
+            if (!widgetElement.hasClass("widget")) {
+                return;
+            }
+            widgetElement.data("popover", true);
+            var widget = getWidget(widgetElement.data("widget-id")),
+                popup = widgetElement.find(".popup");
+            if (widget.data) {
+                switch (widget.type) {
+                    case "html-widget":
+                        popup.find("input[name='url']").val(widget.data.url);
+                        break;
+                    case "grafana-widget":
+                        var grafanaInputBase = popup.find("input[name='url']"),
+                            grafanaSelectDashboard = popup.find("select[name='dashboard']"),
+                            grafanaSelectPanel = popup.find("select[name='panel']");
+                        grafanaSelectDashboard.attr("disabled", true);
+                        grafanaSelectPanel.attr("disabled", true);
+                        grafanaInputBase.val(widget.data.base.api);
+                        var refreshDashboards = function() {
+                            $.ajax(grafanaInputBase.val() + "search", {
+                                crossDomain: true,
+                                xhrFields: {
+                                    withCredentials: true
+                                },
+                                success: function(data) {
+                                    var i, len = data.length,
+                                        dashboard,
+                                        found,
+                                        title;
+                                    grafanaSelectDashboard.empty();
+                                    for (i=0; i<len; i+=1) {
+                                        dashboard = data[i];
+                                        if (widget.data.dashboard === dashboard.uri) {
+                                            found = dashboard.uri;
+                                        }
+                                        title = dashboard.title;
+                                        if (!title) {
+                                            title = dashboard.id;
+                                        }
+                                        grafanaSelectDashboard.append("<option value=\"" + dashboard.uri + "\"" + (widget.data.dashboard === dashboard.uri ? " selected=\"selected\"" : "") + ">" + title + "</option>")
+                                    }
+                                    grafanaSelectDashboard.attr("disabled", false);
+                                    if (found) {
+                                        refreshPanels(found);
+                                    }
+                                },
+                                error: function(response) {
+                                    console.error(response);
+                                }
+                            })
+                        };
+
+                        var refreshPanels = function(dashboard) {
+                            $.ajax(grafanaInputBase.val() + "dashboards/" + dashboard, {
+                                crossDomain: true,
+                                xhrFields: {
+                                    withCredentials: true
+                                },
+                                success: function(data) {
+                                    var panels = [],
+                                        i, len = data.dashboard.rows.length,
+                                        panel,
+                                        title;
+                                    for (i=0; i<len; i+=1) {
+                                        Array.prototype.push.apply(panels,data.dashboard.rows[i].panels);
+                                    }
+                                    len = panels.length;
+                                    grafanaSelectPanel.empty();
+                                    for (i=0; i<len; i+=1) {
+                                        panel = panels[i];
+                                        title = panel.title;
+                                        if (!title) {
+                                            title = panel.id;
+                                        }
+                                        grafanaSelectPanel.append("<option value=\"" + panel.id + "\"" + (widget.data.panel === ''+panel.id ? " selected=\"selected\"" : "") + ">" + title + "</option>")
+                                    }
+                                    grafanaSelectPanel.attr("disabled", false);
+                                },
+                                error: function(response) {
+                                    console.error(response);
+                                }
+                            })
+                        };
+                        grafanaInputBase.on("change", function() {
+                            refreshDashboards();
+                        });
+                        grafanaSelectDashboard.on("change", function() {
+                            refreshPanels(grafanaSelectDashboard.val());
+                        });
+                        refreshDashboards();
+                        break;
+                    default:
+                        // Do nothing
+                        break;
+                }
+            }
+            popup.toggle();
+            event.preventDefault();
+        })
+        .on("doubletap", function(event) {
+            var widgetElement =  $(event.target);
+            if (!widgetElement.hasClass("widget")) {
+                return;
+            }
+            var widget = getWidget(widgetElement.data("widget-id"));
+
+            if (widget) {
+                removeWidget(widget);
+            }
+            event.preventDefault();
         });
 };
 
@@ -455,115 +568,11 @@ $(document).ready(function() {
         $( "body").toggleClass("edit");
         $( ".widget" ).toggleClass("show");
     });
-
-    grid.on("click", ".action-edit-widget", function(event) {
-        var widgetElement =  $(event.target).parents(".widget");
-        var widget = getWidget(widgetElement.data("widget-id")),
-            popup = widgetElement.find(".popup");
-        if (widget.data) {
-            switch (widget.type) {
-                case "html-widget":
-                    popup.find("input[name='url']").val(widget.data.url);
-                    break;
-                case "grafana-widget":
-                    var grafanaInputBase = popup.find("input[name='url']"),
-                        grafanaSelectDashboard = popup.find("select[name='dashboard']"),
-                        grafanaSelectPanel = popup.find("select[name='panel']");
-                    grafanaSelectDashboard.attr("disabled", true);
-                    grafanaSelectPanel.attr("disabled", true);
-                    grafanaInputBase.val(widget.data.base.api);
-                    var refreshDashboards = function() {
-                        $.ajax(grafanaInputBase.val() + "search", {
-                            crossDomain: true,
-                            xhrFields: {
-                                withCredentials: true
-                            },
-                            success: function(data) {
-                                var i, len = data.length,
-                                    dashboard,
-                                    found,
-                                    title;
-                                grafanaSelectDashboard.empty();
-                                for (i=0; i<len; i+=1) {
-                                    dashboard = data[i];
-                                    if (widget.data.dashboard === dashboard.uri) {
-                                        found = dashboard.uri;
-                                    }
-                                    title = dashboard.title;
-                                    if (!title) {
-                                        title = dashboard.id;
-                                    }
-                                    grafanaSelectDashboard.append("<option value=\"" + dashboard.uri + "\"" + (widget.data.dashboard === dashboard.uri ? " selected=\"selected\"" : "") + ">" + title + "</option>")
-                                }
-                                grafanaSelectDashboard.attr("disabled", false);
-                                if (found) {
-                                    refreshPanels(found);
-                                }
-                            },
-                            error: function(response) {
-                                console.error(response);
-                            }
-                        })
-                    };
-
-                    var refreshPanels = function(dashboard) {
-                        $.ajax(grafanaInputBase.val() + "dashboards/" + dashboard, {
-                            crossDomain: true,
-                            xhrFields: {
-                                withCredentials: true
-                            },
-                            success: function(data) {
-                                var panels = [],
-                                    i, len = data.dashboard.rows.length,
-                                    panel,
-                                    title;
-                                for (i=0; i<len; i+=1) {
-                                    Array.prototype.push.apply(panels,data.dashboard.rows[i].panels);
-                                }
-                                len = panels.length;
-                                grafanaSelectPanel.empty();
-                                for (i=0; i<len; i+=1) {
-                                    panel = panels[i];
-                                    title = panel.title;
-                                    if (!title) {
-                                        title = panel.id;
-                                    }
-                                    grafanaSelectPanel.append("<option value=\"" + panel.id + "\"" + (widget.data.panel === ''+panel.id ? " selected=\"selected\"" : "") + ">" + title + "</option>")
-                                }
-                                grafanaSelectPanel.attr("disabled", false);
-                            },
-                            error: function(response) {
-                                console.error(response);
-                            }
-                        })
-                    };
-                    grafanaInputBase.on("change", function() {
-                        refreshDashboards();
-                    });
-                    grafanaSelectDashboard.on("change", function() {
-                        refreshPanels(grafanaSelectDashboard.val());
-                    });
-                    refreshDashboards();
-                    break;
-                default:
-                    // Do nothing
-                    break;
-            }
-        }
-        popup.toggle();
-    });
-    grid.on("click", ".action-delete-widget", function(event) {
-        var widget = getWidget($(event.target).parents(".widget").data("widget-id"));
-        if (widget) {
-            removeWidget(widget);
-        }
-    });
     grid.on("click", ".action-cancel-widget-edit", function(event) {
         $(event.target).parents(".popup").toggle();
     });
     grid.on("click", ".action-save-widget-edit", function(event) {
         var widgetElement = $(event.target).parents(".widget");
-        widgetElement.find(".popup").toggle();
         var widget = getWidget(widgetElement.data("widget-id"));
         switch (widget.type) {
             case "html-widget":
@@ -590,6 +599,7 @@ $(document).ready(function() {
                 break;
         }
         persist();
+        widgetElement.find(".popup").toggle();
     });
 });
 
