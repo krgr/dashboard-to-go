@@ -172,30 +172,30 @@ var addToTable = function(widget) {
 
     div.appendTo(gridcell);
 
-    interact( "#" + div.attr("id") )
-        .draggable(interactInteractionDraggable)
-        .resizable({
-            edges: { left: false, right: '.widget-resize-handler', bottom: '.widget-resize-handler', top: false }
-        })
-        .on('dragmove', interactEventDragmove)
-        .on('resizemove', function (event) {
-            var target = $(event.target);
-            var widgetCol = Math.ceil(event.rect.width / cellWidth);
-            var widgetRow = Math.ceil(event.rect.height / cellHeight);
-            target.width(widgetCol * cellWidth - 2 + 'px');
-            target.height(widgetRow * cellHeight - 2 + 'px');
-            // resize iframe
-            var iframe = target.find(".show-view iframe");
-            iframe[0].width = target.width();
-            iframe[0].height = target.height();
-            var widget = getWidget(target.data("widget-id"));
-            widget.dimension = { col: widgetCol, row: widgetRow };
-        })
-        .on("resizeend", function(event) {
-            persist();
-            var iframe = $(event.target).find(".show-view iframe");
-            iframe.attr("src", iframe.attr("src"));
-        });
+    // interact( "#" + div.attr("id") )
+    //     .draggable(interactInteractionDraggable)
+    //     .resizable({
+    //         edges: { left: false, right: '.widget-resize-handler', bottom: '.widget-resize-handler', top: false }
+    //     })
+    //     .on('dragmove', interactEventDragmove)
+    //     .on('resizemove', function (event) {
+    //         var target = $(event.target);
+    //         var widgetCol = Math.ceil(event.rect.width / cellWidth);
+    //         var widgetRow = Math.ceil(event.rect.height / cellHeight);
+    //         target.width(widgetCol * cellWidth - 2 + 'px');
+    //         target.height(widgetRow * cellHeight - 2 + 'px');
+    //         // resize iframe
+    //         var iframe = target.find(".show-view iframe");
+    //         iframe[0].width = target.width();
+    //         iframe[0].height = target.height();
+    //         var widget = getWidget(target.data("widget-id"));
+    //         widget.dimension = { col: widgetCol, row: widgetRow };
+    //     })
+    //     .on("resizeend", function(event) {
+    //         persist();
+    //         var iframe = $(event.target).find(".show-view iframe");
+    //         iframe.attr("src", iframe.attr("src"));
+    //     });
 };
 
 var removeFromTable = function(widget) {
