@@ -68,21 +68,7 @@ body {
         #grid td div.grafana-widget iframe { border: none; }
         body.edit #grid td div.grafana-widget { background: rgba(57, 73, 84, 0.7); }
         #grid td div.popup {
-            display: none;
-            top: 1em;
-            left: 1em;
-            background-color: #ffffff;
-            padding: 1em;
-            transition-duration: 0.3s;
-            transition-property: opacity;
-            -moz-border-radius: 10px;
-            -webkit-border-radius: 10px;
-            border-radius: 10px; /* future proofing */
-            -khtml-border-radius: 10px; /* for old Konqueror browsers */ }
-        #grid td div.edit div.popup {
-            display: block !important;
-        }
-        #grid td div.popup input { border: 1px solid #dddddd; }
+            display: none; }
     #widget-bar .widget {
         background-color: #091c2d;
         border: 1px solid #394954; }
@@ -182,17 +168,22 @@ body.edit article {
 }
 
 #dialog .content {
-    background-color: white;
+    background-color: lightgray;
     position: absolute;
-    padding: 5%;
+    display: flex;
+    flex-direction: column;
+    padding: 1em;
     left: 10%;
     right: 10%;
     top: 10%;
     bottom: 10%;
-}
+    transition-duration: 0.3s;
+    transition-property: opacity;
+    -moz-border-radius: 10px;
+    -webkit-border-radius: 10px;
+    border-radius: 10px; /* future proofing */
+    -khtml-border-radius: 10px; /* for old Konqueror browsers */ }
 
-#dialog .content .fa.fa-close {
-    position: absolute;
-    right: 5px;
-    top: 5px;
+#dialog .content .fa.fa-close, #dialog .content .fa-check {
+    align-self: flex-end;
 }
