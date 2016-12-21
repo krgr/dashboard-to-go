@@ -409,10 +409,17 @@ $(document).ready(function() {
     });
 
     new Clipboard("#page-share-action", {
-        text: function() {
-            return getSharePageUrl();
-        }
-    });
+            text: function() {
+                return getSharePageUrl();
+            }
+        })
+        .on("success", function() {
+            var notification = $("<div class=\"notification\">Copied share URL to clipboard!</div>");
+            notification.appendTo($("body"));
+            setTimeout(function() {
+                notification.remove();
+            }, 2500);
+        });
 
     addRowButton.on("click", function() {
         storage.config.page.rows += 1;
