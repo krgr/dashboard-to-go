@@ -184,9 +184,11 @@ var addToTable = function(widget) {
             if (!widgetElement.hasClass("widget")) {
                 return;
             }
-            widgetElement.data("popover", true);
             var widget = getWidget(widgetElement.data("widget-id")),
-                popup = widgetElement.find(".popup");
+                popup = widgetElement.find(".popup").clone(true);
+            dialogContent.find(".popup").remove();
+            dialogContent.append(popup);
+            dialog.data("widget-id", widget.id);
             if (widget.data) {
                 switch (widget.type) {
                     case "html-widget":
@@ -277,7 +279,8 @@ var addToTable = function(widget) {
                         break;
                 }
             }
-            popup.toggle();
+            dialogContent.find(".popup").show();
+            dialog.show();
             event.preventDefault();
         })
         .on("doubletap", function(event) {
@@ -409,6 +412,7 @@ var getShareAllPagesUrl = function() {
 };
 
 var grid,
+    dialog, dialogContent,
     prevPageButton, nextPageButton,
     addPageButton, removePageButton,
     sharePageButton,
@@ -470,6 +474,8 @@ var refreshCells = function(grid) {
 
 $(document).ready(function() {
     grid = $("#grid");
+    dialog = $("#dialog");
+    dialogContent = $("#dialog-content");
     prevPageButton = $("#page-left-action");
     nextPageButton = $("#page-right-action");
     sharePageButton = $("#page-share-action");
@@ -576,12 +582,13 @@ $(document).ready(function() {
         $( "body").toggleClass("edit");
         $( ".widget" ).toggleClass("show");
     });
-    grid.on("click", ".action-cancel-widget-edit", function(event) {
-        $(event.target).parents(".popup").toggle();
+    dialog.on("click", ".action-cancel-widget-edit", function(event) {
+        dialog.hide();
     });
-    grid.on("click", ".action-save-widget-edit", function(event) {
-        var widgetElement = $(event.target).parents(".widget");
-        var widget = getWidget(widgetElement.data("widget-id"));
+    dialogContent.on("click", ".action-save-widget-edit", function(event) {
+        var widget = getWidget(dialog.data("widget-id"));
+        var widgetElement = $("#widget-" + widget.id);
+        console.log(widgetElement);
         switch (widget.type) {
             case "html-widget":
                 if (!widget.data) {
@@ -607,7 +614,7 @@ $(document).ready(function() {
                 break;
         }
         persist();
-        widgetElement.find(".popup").toggle();
+        dialog.hide();
     });
 });
 
