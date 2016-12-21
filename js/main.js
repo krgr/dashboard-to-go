@@ -383,15 +383,6 @@ var getWidget = function(id) {
     }
 };
 
-var showNotification = function(text, timeout) {
-    timeout = timeout || 2500;
-    var notification = $("<div class=\"notification\">" + text + "</div>");
-    notification.appendTo($("body"));
-    setTimeout(function() {
-        notification.remove();
-    }, timeout);
-};
-
 /*
  * SHARING
  */
@@ -512,6 +503,7 @@ var refreshCells = function(grid) {
 };
 
 $(document).ready(function() {
+    $.notify.defaults({ autoHideDelay: 2500, showDuration: 200, showAnimation: 'fadeIn', hideAnimation: 'fadeOut' });
     grid = $("#grid");
     dialog = $("#dialog");
     dialogContent = $("#dialog-content");
@@ -584,7 +576,7 @@ $(document).ready(function() {
             }
         })
         .on("success", function() {
-            showNotification("Copied share URL to clipboard!", 2500);
+            $.notify("Copied share URL to clipboard!", "success")
         });
 
     addRowButton.on("click", function() {
@@ -632,10 +624,11 @@ $(document).ready(function() {
                 if (!widget.data) {
                     widget.data = {};
                 }
-                var htmlPopup = $(event.target).parents(".popup"),
+                var htmlPopup = $(event.target).parents(".content"),
                     htmlUrl = htmlPopup.find("input[name='url']").val();
+                console.log(htmlPopup);
                 if (!htmlUrl || 7 > htmlUrl.length) {
-                    showNotification("You need to set an URL!", 2500);
+                    $.notify("You need to set a URL!");
                     return;
                 }
                 widget.data.url = htmlUrl;
@@ -645,21 +638,21 @@ $(document).ready(function() {
                 if (!widget.data) {
                     widget.data = {};
                 }
-                var grafanaPopup = $(event.target).parents(".popup"),
+                var grafanaPopup = $(event.target).parents(".content"),
                     grafanaPanel = grafanaPopup.find("select[name='panel']").val(),
                     grafanaApi = grafanaPopup.find("input[name='api']").val(),
                     grafanaWidget = grafanaPopup.find("input[name='widget']").val(),
                     grafanaDashboard = grafanaPopup.find("select[name='dashboard']").val();
                 if (!grafanaWidget || 7 > grafanaWidget.length) {
-                    showNotification("You need to set a Grafana Widget base URL!", 2500);
+                    $.notify("You need to set a Grafana Widget base URL!");
                     return;
                 }
                 else if (!grafanaDashboard) {
-                    showNotification("You need to select a Grafana Dashboard!", 2500);
+                    $.notify("You need to select a Grafana Dashboard!");
                     return;
                 }
                 else if (!grafanaPanel) {
-                    showNotification("You need to select a Grafana Panel!", 2500);
+                    $.notify("You need to select a Grafana Panel!");
                     return;
                 }
                 widget.data.url = grafanaWidget + grafanaDashboard + "?panelId=" + grafanaPanel + "&fullscreen";
@@ -681,16 +674,16 @@ $(document).ready(function() {
                 if (!widget.data) {
                     widget.data = {};
                 }
-                var zmonPopup = $(event.target).parents(".popup"),
+                var zmonPopup = $(event.target).parents(".content"),
                     zmonApi = zmonPopup.find("input[name='api']").val(),
                     zmonWidget = zmonPopup.find("input[name='widget']").val(),
                     zmonDashboard = parseInt(zmonPopup.find("select[name='dashboard']").val());
                 if (!zmonWidget || 7 > zmonWidget.length) {
-                    showNotification("You need to set a ZMON Widget base URL!", 2500);
+                    $.notify("You need to set a ZMON Widget base URL!");
                     return;
                 }
                 else if (!zmonDashboard) {
-                    showNotification("You need to select a ZMON Dashboard!", 2500);
+                    $.notify("You need to select a ZMON Dashboard!");
                     return;
                 }
                 widget.data.url = zmonWidget + zmonDashboard + "?compact=true";
