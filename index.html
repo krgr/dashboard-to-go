@@ -33,17 +33,24 @@
                         </clipPath>
                     </defs>
                 </svg-->
+                <div id="menu-bar">
+                    <i id="column-add-action" class="fa fa-chevron-right fa-3x fa-fw action-column-add"></i>
+                    <i id="column-remove-action" class="fa fa-chevron-left fa-3x fa-fw action-column-remove"></i>
+                </div>
                 <img id="ok-action" alt="ok" src="images/ok.svg" class="action-edit" />
                 <div id="widget-bar">
-                    <img id="html-widget" alt="html-widget" src="images/html.svg" class="widget initial" data-widget-type="html-widget" />
+                    <i id="html-widget" class="widget initial fa fa-code fa-3x fa-fw" data-widget-type="html-widget"></i>
                     <i id="grafana-widget" class="widget initial fa fa-area-chart fa-3x fa-fw" data-widget-type="grafana-widget"> </i>
+                    <i id="zmon-widget" class="widget initial fa fa-bar-chart fa-3x fa-fw" data-widget-type="zmon-widget"> </i>
                 </div>
                 <div id="sidebar-top" class="sidebar">
                     <i id="page-add-action" class="fa fa-plus-square fa-3x fa-fw action-page-add"></i>
                     <i id="page-remove-action" class="fa fa-window-close fa-rotate-90 fa-3x fa-fw action-page-remove"></i>
+                    <i id="page-share-action" class="fa fa-share-square fa-3x fa-fw action-page-share"></i>
                 </div>
                 <div id="sidebar-bottom" class="sidebar">
-                    <i id="page-share-action" class="fa fa-share-square fa-3x fa-fw action-page-share"></i>
+                    <i id="row-add-action" class="fa fa-chevron-down fa-3x fa-fw action-row-add"></i>
+                    <i id="row-remove-action" class="fa fa-chevron-up fa-3x fa-fw action-row-remove"></i>
                 </div>
                 <article> <!-- a dashboard page -->
                     <!--header>
@@ -129,6 +136,7 @@
         <div id="widget-templates">
             <div class="widget show html-widget">
                 <div class="edit-view">
+                    <i class="fa fa-code fa-fw fa-3x" ></i>
                     <ul>
                         <li><i class="fa fa-cog fa-3x fa-fw action-edit-widget"></i></li>
                         <li><i class="fa fa-trash-o fa-3x fa-fw action-delete-widget"></i></li>
