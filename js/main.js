@@ -14,34 +14,85 @@ function generateUUID(){
     });
 }
 
-var storage = {
-        widgets: []
+var defaultPage = generateUUID(),
+    storage = {
+        page: defaultPage,
+        pages: [
+            {
+                id: defaultPage,
+                title: "Default",
+                widgets: []
+            }
+        ],
+        config: {
+            page: {
+                cols: 26,
+                rows: 12
+            },
+            widgets: {
+                grafana: {
+                    base: {
+                        api: 'https://alpha.zmon.zalan.do/rest/grafana/api/',
+                        widget: 'https://alpha.zmon.zalan.do/grafana/dashboard-solo/'
+                    }
+                }
+            }
+        }
     },
-    grafana = {
-        base: {
-            api: 'https://alpha.zmon.zalan.do/rest/grafana/api/',
-            widget: 'https://alpha.zmon.zalan.do/grafana/dashboard-solo/'
+    // Some defaults we can offer to the user for configuration
+    defaults = {
+        config: {
+            page: {
+                landscape : {
+                    cols: 26,
+                    rows: 12
+                },
+                portrait: {
+                    cols: 12,
+                    rows: 26
+                }
+            }
         }
     };
 
 /*
  * LOCAL STORAGE
  */
+var persist = function() {
+    if (typeof(Storage) !== "undefined") {
+        localStorage.dashboard2go = JSON.stringify(storage);
+    }
+};
+
 if (typeof(Storage) !== "undefined") {
     var tmp;
     if (localStorage.dashboard2go) {
         tmp = JSON.parse(localStorage.dashboard2go);
     }
     if (tmp) {
+        var migrate = false;
+        if (!tmp.config) {
+            tmp.config = storage.config;
+            migrate = true;
+        }
+        if (!tmp.pages) {
+            tmp.page = generateUUID();
+            tmp.pages = [];
+            tmp.pages.push({
+                id: tmp.page,
+                title: "Default",
+                widgets: tmp.widgets
+            });
+            migrate = true;
+        }
+
+        if (migrate) {
+            persist();
+        }
+
         storage = tmp;
     }
 }
-
-var persist = function() {
-    if (typeof(Storage) !== "undefined") {
-        localStorage.dashboard2go = JSON.stringify(storage);
-    }
-};
 
 /*
  * INTERACTION HELPER
@@ -126,14 +177,7 @@ var addToTable = function(widget) {
         .resizable({
             edges: { left: false, right: '.widget-resize-handler', bottom: '.widget-resize-handler', top: false }
         })
-        .on('dragstart', function (event) {
-            console.log("dragstart", event);
-            console.log("position", $(event.target).position());
-        })
         .on('dragmove', interactEventDragmove)
-        .on('resizestart', function (event) {
-            console.log("resize start", event);
-        })
         .on('resizemove', function (event) {
             var target = $(event.target);
             var widgetCol = Math.ceil(event.rect.width / cellWidth);
@@ -148,14 +192,9 @@ var addToTable = function(widget) {
             widget.dimension = { col: widgetCol, row: widgetRow };
         })
         .on("resizeend", function(event) {
-            console.log("resize end", event);
             persist();
-            var target = $(event.target);
-            var iframe = target.find(".show-view iframe");
-            // reload doesn't work for now because the following code results in the error
-            // "Blocked a frame with origin "null" from accessing a cross-origin frame."
-
-            //iframe[0].contentWindow.location.reload();
+            var iframe = $(event.target).find(".show-view iframe");
+            iframe.attr("src", iframe.attr("src"));
         });
 };
 
@@ -163,55 +202,66 @@ var removeFromTable = function(widget) {
     $("#widget-" + widget.id).remove();
 };
 
+var getPage = function(id) {
+    var i, len = storage.pages.length;
+    for (i=0; i<len; i+=1) {
+        if (id === storage.pages[i].id) {
+            return storage.pages[i];
+        }
+    }
+};
+
 var addWidget = function(widget) {
     widget.id = generateUUID();
     switch (widget.type) {
         case "grafana-widget":
-            widget.data = {
-                base: grafana.base
-            };
+            if (!widget.data) {
+                widget.data = {
+                    base: storage.config.widgets.grafana.base
+                };
+            }
             break;
         default:
             break;
     }
-    storage.widgets.push(widget);
+    getPage(storage.page).widgets.push(widget);
     persist();
     addToTable(widget);
 };
 
 var removeWidget = function(widget) {
-    var i, len = storage.widgets.length;
+    var page = getPage(storage.page),
+        i, len = page.widgets.length;
     for (i=0; i< len; i += 1) {
-        if (widget.id === storage.widgets[i].id) {
+        if (widget.id === page.widgets[i].id) {
             break;
         }
     }
     if (i < len) {
-        storage.widgets.splice(i, 1);
+        page.widgets.splice(i, 1);
         persist();
         removeFromTable(widget);
     }
 };
 
 var getWidget = function(id) {
-    var widget,
-        i, len = storage.widgets.length;
+    var page = getPage(storage.page),
+        i, len = page.widgets.length;
     for (i=0; i< len; i += 1) {
-        if (id === storage.widgets[i].id) {
-            widget = storage.widgets[i];
-            break;
+        if (id === page.widgets[i].id) {
+            return page.widgets[i];
         }
     }
-    return widget;
 };
 
 var grid;
 
 $(document).ready(function() {
     var widget,
-        i, len = storage.widgets.length;
+        page = getPage(storage.page),
+        i, len = page.widgets.length;
     for (i=0; i < len; i += 1) {
-        addToTable(tmp.widgets[i]);
+        addToTable(page.widgets[i]);
     }
 
     grid = $("#grid");
@@ -368,9 +418,6 @@ interact( "#widget-bar .widget" )
 interact( "#grid td" )
     .dropzone({
         accept: '.widget',
-        ondropactivate: function(event) {
-            // Maybe do something
-        },
         ondragenter: function(event) {
             event.target.classList.add('drop-target');
             event.relatedTarget.classList.add('can-drop');
@@ -425,8 +472,5 @@ interact( "#grid td" )
                 addWidget(widget);
             }
 
-        },
-        ondropdeactivate: function(event) {
-            // Maybe do something
         }
     });
