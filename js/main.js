@@ -314,6 +314,9 @@ var addToTable = function(widget) {
                                         found,
                                         title;
                                     zmonSelectDashboard.empty();
+                                    data.sort(function(a,b){
+                                        return a.name.localeCompare(b.name);
+                                    });
                                     for (i=0; i<len; i+=1) {
                                         dashboard = data[i];
                                         if (widget.data.dashboard === dashboard.id) {
